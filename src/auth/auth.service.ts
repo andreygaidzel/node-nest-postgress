@@ -13,8 +13,8 @@ export class AuthService {
   }
 
   async login(userDto: CreateUserDto) {
-    const user = await this.validateUser(userDto)
-    return this.generateToken(user)
+    const user = await this.validateUser(userDto);
+    return this.generateToken(user);
   }
 
   async registration(userDto: CreateUserDto) {
@@ -36,7 +36,7 @@ export class AuthService {
 
   private async validateUser(userDto: CreateUserDto) {
     const user = await this.userService.getUserByEmail(userDto.email);
-    const passwordEquals = await bcrypt.compare(userDto.password, user.password);
+    const passwordEquals = user && await bcrypt.compare(userDto.password, user.password);
     if (user && passwordEquals) {
       return user;
     }
