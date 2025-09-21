@@ -13,13 +13,12 @@ import { AuthModule } from "./auth/auth.module";
 import { PostsModule } from "./posts/posts.module";
 import { FilesModule } from "./files/files.module";
 
-console.log('DB config:', process.env.NODE_ENV);
 @Module({
   controllers: [],
   providers: [],
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `.${process.env.NODE_ENV}.env`
+      envFilePath: `backend/.${process.env.NODE_ENV}.env`
     }),
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname, 'static'),

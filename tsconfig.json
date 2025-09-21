@@ -21,5 +21,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": ["backend/src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
