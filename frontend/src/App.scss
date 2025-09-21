@@ -1,0 +1,9 @@
+
+.layout {
+  height: 100vh;
+  &-body {
+    display: flex;
+    height: 100%;
+    background: #fff;
+  }
+}
