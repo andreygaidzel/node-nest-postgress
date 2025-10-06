@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { IPost } from '../models/IPost.ts';
+import { baseUrl } from '../shared/constants/baseConfig.ts';
 
 interface FetchPostsArgs {
   limit?: number;
@@ -8,7 +9,7 @@ interface FetchPostsArgs {
 
 export const postAPI = createApi({
   reducerPath: 'postAPI',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5000' }),
+  baseQuery: fetchBaseQuery({ baseUrl }),
   tagTypes: ['Post'],
   endpoints: (build) => ({
     fetchPosts: build.query<IPost[], FetchPostsArgs>({

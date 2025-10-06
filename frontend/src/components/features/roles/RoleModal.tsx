@@ -11,18 +11,22 @@ import {
   TextField,
 } from '@mui/material';
 import { type FormEvent, useState } from 'react';
+import { useCreateRoleMutation } from '../../../services/RoleService.ts';
+import type { IRole } from '../../../models/IRole.ts';
 
 function RoleModal() {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
+  const [description, setDescription] = useState('');
+  const [role, setRole] = useState('');
+  const [createRole] = useCreateRoleMutation();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log('Форма отправлена:', { title, category });
+    console.log('Форма отправлена:', { role, description }, e);
+    await createRole({ value: role, description } as IRole);
     handleClose();
   };
 
@@ -36,33 +40,32 @@ function RoleModal() {
         <DialogTitle>Create Role</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
-            <TextField
-              margin='dense'
-              label='Заголовок'
-              type='text'
-              fullWidth
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-
             <FormControl fullWidth margin='dense'>
-              <InputLabel id='category-label'>Категория</InputLabel>
+              <InputLabel id='category-label'>Role</InputLabel>
               <Select
                 labelId='category-label'
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
               >
-                <MenuItem value='news'>Новости</MenuItem>
-                <MenuItem value='blog'>Блог</MenuItem>
-                <MenuItem value='article'>Статья</MenuItem>
+                <MenuItem value='admin'>Admin</MenuItem>
+                <MenuItem value='emplyee'>Employee</MenuItem>
               </Select>
             </FormControl>
+
+            <TextField
+              margin='dense'
+              label='Descruption'
+              type='text'
+              fullWidth
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleClose}>Отмена</Button>
+            <Button onClick={handleClose}>Cancel</Button>
             <Button type='submit' variant='contained'>
-              Сохранить
+              Save
             </Button>
           </DialogActions>
         </form>

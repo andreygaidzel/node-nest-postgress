@@ -1,34 +1,42 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { User } from "./users.model";
-import { InjectModel } from "@nestjs/sequelize";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { RolesService } from "../roles/roles.service";
-import { AddRoleDto } from "./dto/add-role.dto";
-import { BanUserDto } from "./dto/ban-user.dto";
+import { SafeUser, User } from './users.model';
+import { InjectModel } from '@nestjs/sequelize';
+import { CreateUserDto } from './dto/create-user.dto';
+import { RolesService } from '../roles/roles.service';
+import { AddRoleDto } from './dto/add-role.dto';
+import { BanUserDto } from './dto/ban-user.dto';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectModel(User) private userRepository: typeof User,
+    private roleService: RolesService,
+  ) {}
 
-  constructor(@InjectModel(User) private userRepository: typeof User,
-              private roleService: RolesService) {
-  }
-
-  async createUser(dto: CreateUserDto) {
+  async createUser(dto: CreateUserDto): Promise<SafeUser> {
     const user = await this.userRepository.create(dto);
-    const role = await this.roleService.getRoleByValue("ADMIN")
+    const role = await this.roleService.getRoleByValue('admin');
     if (role) {
       await user.$set('roles', [role.id]);
       user.roles = [role];
     }
-    return user;
+    const { password, ...payload } = user.get({ plain: true });
+    return payload satisfies SafeUser;
   }
 
   async getAllUsers() {
     return await this.userRepository.findAll({ include: { all: true } });
   }
 
+  async getUserById(id: number) {
+    return await this.userRepository.findOne({ where: { id } });
+  }
+
   async getUserByEmail(email: string) {
-    return await this.userRepository.findOne({ where: { email }, include: { all: true } });
+    return await this.userRepository.findOne({
+      where: { email },
+      include: { all: true },
+    });
   }
 
   async addRole(dto: AddRoleDto) {
@@ -38,7 +46,10 @@ export class UsersService {
       await user.$add('role', role.id);
       return dto;
     }
-    throw new HttpException('Пользователь или роль не найдены', HttpStatus.NOT_FOUND);
+    throw new HttpException(
+      'Пользователь или роль не найдены',
+      HttpStatus.NOT_FOUND,
+    );
   }
 
   async ban(dto: BanUserDto) {

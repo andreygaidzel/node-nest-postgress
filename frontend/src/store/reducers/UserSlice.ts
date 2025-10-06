@@ -1,6 +1,6 @@
 import type { IUser } from '../../models/IUser';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { fetchUsers } from './ActionCreators';
+import { addUser, fetchUsers } from './ActionCreators';
 
 interface UserState {
   users: IUser[];
@@ -12,7 +12,7 @@ const initialState: UserState = {
   users: [],
   isLoading: false,
   error: '',
-}
+};
 
 export const userSlice = createSlice({
   name: 'user',
@@ -26,7 +26,7 @@ export const userSlice = createSlice({
       // обработка fulfilled
       .addCase(fetchUsers.fulfilled, (state, action: PayloadAction<IUser[]>) => {
         state.isLoading = false;
-        state.error = "";
+        state.error = '';
         state.users = action.payload;
       })
       // обработка rejected
@@ -34,7 +34,21 @@ export const userSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload || 'Any error';
       });
-  }
-})
+
+    builder
+      .addCase(addUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addUser.fulfilled, (state, action: PayloadAction<IUser>) => {
+        state.isLoading = false;
+        state.error = '';
+        state.users.push(action.payload);
+      })
+      .addCase(addUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || 'Any error';
+      });
+  },
+});
 
 export default userSlice.reducer;

@@ -16,6 +16,9 @@ function Sidebar() {
       <NavLink className='sidebar-link' to='/roles'>
         Roles
       </NavLink>
+      <NavLink className='sidebar-link' to='/playground'>
+        Playground
+      </NavLink>
     </div>
   );
 }
