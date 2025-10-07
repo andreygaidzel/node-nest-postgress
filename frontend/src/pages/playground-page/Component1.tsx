@@ -1,5 +1,5 @@
 import { type JSX, memo, useContext, useEffect, useRef, useState } from 'react';
-import { UserContext } from '../../App.tsx';
+import { UserContext } from '@/App';
 
 function humanizeTime(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
