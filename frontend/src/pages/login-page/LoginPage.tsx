@@ -36,10 +36,6 @@ const LoginPage: FC = () => {
     console.log('Отправляем данные:', { email, password });
 
     dispatch(login({ email, password }));
-
-    // loginUser({ email, password })
-    //   .then(...)
-    //   .catch(...)
   };
 
   return (

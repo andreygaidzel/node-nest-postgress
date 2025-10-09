@@ -3,7 +3,7 @@
   height: 100vh;
   &-body {
     display: flex;
-    height: 100%;
+    height: calc(100% - 80px);
     background: #fff;
   }
 }

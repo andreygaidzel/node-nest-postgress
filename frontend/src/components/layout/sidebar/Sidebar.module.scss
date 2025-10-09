@@ -4,9 +4,14 @@
   background: #f8eec4;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   padding: 1rem;
   box-shadow: 3px 1px 10px rgba(108, 63, 63, 0.66);
-  &-link {
+  &Wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+  &Link {
     color: brown;
     font-size: 1.4rem;
     &.active {
