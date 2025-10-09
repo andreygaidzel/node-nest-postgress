@@ -9,16 +9,16 @@ import {
   Typography,
 } from '@mui/material';
 import { type FormEvent, useState } from 'react';
-import { addUser } from '../../../store/reducers/ActionCreators.ts';
+import { addUser } from '@/store/reducers/ActionCreators.ts';
 import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '../../../store/store.ts';
+import type { AppDispatch, RootState } from '@/store/store.ts';
 
 function UserModal() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch<AppDispatch>();
-  const { error, isLoading } = useSelector((state: RootState) => state.user);
+  const { error, isLoading } = useSelector((state: RootState) => state.users);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

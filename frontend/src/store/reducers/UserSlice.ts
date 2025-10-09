@@ -23,13 +23,11 @@ export const userSlice = createSlice({
       .addCase(fetchUsers.pending, (state) => {
         state.isLoading = true;
       })
-      // обработка fulfilled
       .addCase(fetchUsers.fulfilled, (state, action: PayloadAction<IUser[]>) => {
         state.isLoading = false;
         state.error = '';
         state.users = action.payload;
       })
-      // обработка rejected
       .addCase(fetchUsers.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || 'Any error';

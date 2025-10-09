@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '../../store/store.ts';
+import type { AppDispatch, RootState } from '@/store/store.ts';
 import { useEffect } from 'react';
-import { fetchUsers } from '../../store/reducers/ActionCreators.ts';
-import UserModal from '../../components/features/users/UserModal.tsx';
+import { fetchUsers } from '@/store/reducers/ActionCreators.ts';
+import UserModal from '@/components/features/users/UserModal.tsx';
 
 function UsersPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const { users, error, isLoading } = useSelector((state: RootState) => state.user);
+  const { users, error, isLoading } = useSelector((state: RootState) => state.users);
   useEffect(() => {
     dispatch(fetchUsers({ page: 1, limit: 10 }));
   }, [dispatch]);

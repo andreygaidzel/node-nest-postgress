@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './reducers/UserSlice';
+import authReducer from './reducers/AuthSlice';
 import { postAPI } from '../services/PostService';
 import { roleAPI } from '../services/RoleService.ts';
 
 export const setupStore = () => {
   return configureStore({
     reducer: {
-      user: userReducer,
+      users: userReducer,
+      auth: authReducer,
       [postAPI.reducerPath]: postAPI.reducer,
       [roleAPI.reducerPath]: roleAPI.reducer,
     },
