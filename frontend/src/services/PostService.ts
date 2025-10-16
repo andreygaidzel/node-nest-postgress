@@ -1,6 +1,7 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IPost } from '../models/IPost.ts';
-import { baseUrl } from '../shared/constants/baseConfig.ts';
+import { baseQueryWithReauth } from '@/baseQuery.ts';
+import type { IPaginatedList } from '@/models/IPaginatedList.ts';
 
 interface FetchPostsArgs {
   limit?: number;
@@ -9,20 +10,20 @@ interface FetchPostsArgs {
 
 export const postAPI = createApi({
   reducerPath: 'postAPI',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ['Post'],
   endpoints: (build) => ({
-    fetchPosts: build.query<IPost[], FetchPostsArgs>({
+    fetchPosts: build.query<IPaginatedList<IPost>, FetchPostsArgs>({
       query: ({ limit = 5, page = 1 }) => ({
         url: `/posts`,
         params: {
-          _limit: limit,
-          _page: page,
+          pageSize: limit,
+          page: page,
         },
       }),
       providesTags: () => ['Post'],
     }),
-    createPost: build.mutation<IPost, IPost>({
+    createPost: build.mutation<IPost, FormData>({
       query: (post) => ({
         url: `/posts`,
         method: 'POST',

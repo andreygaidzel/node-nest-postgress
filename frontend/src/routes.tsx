@@ -15,6 +15,7 @@ import RegisterPage from '@/pages/register-page/RegisterPage.tsx';
 import NotFoundPage from '@/pages/not-found-page/NotFoundPage.tsx';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store.ts';
+import PostsPage from '@/pages/posts-page/PostsPage.tsx';
 
 export interface IRoute {
   path: string;
@@ -27,23 +28,32 @@ export const publicRoutes: IRoute[] = [
   {
     path: `${Paths.HOME}/*`,
     element: <HomePage />,
+    onlyAuth: true,
   },
   {
     path: `${Paths.PRODUCTS}`,
     element: <ProductsPage />,
+    onlyAuth: true,
+  },
+  {
+    path: `${Paths.POSTS}`,
+    element: <PostsPage />,
+    onlyAuth: true,
   },
   {
     path: `${Paths.USERS}`,
     element: <UsersPage />,
-    // onlyAuth: true,
+    onlyAuth: true,
   },
   {
     path: `${Paths.ROLES}`,
     element: <RolesPage />,
+    onlyAuth: true,
   },
   {
     path: `${Paths.PLAYGROUND}`,
     element: <PlaygroundPage />,
+    onlyAuth: true,
   },
   {
     path: '*',

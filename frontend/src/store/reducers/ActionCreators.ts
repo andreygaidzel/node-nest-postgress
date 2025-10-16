@@ -4,19 +4,22 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { baseUrl } from '@/shared/constants/baseConfig.ts';
 import type { ILoginForm } from '@/models/ILoginForm.ts';
 import type { ILogin } from '@/models/ILogin.ts';
+import { callBaseQuery } from '@/utils/callBaseQuery.ts';
 
 export const fetchUsers = createAsyncThunk<
   IUser[],
   { limit?: number; page?: number },
   { rejectValue: string }
->('user/fetchAll', async ({ limit = 5, page = 1 }, thunkAPI) => {
+>('user/fetchAll', async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get<IUser[]>(`${baseUrl}/users`, {
-      params: { _limit: limit, _page: page },
-    });
-    return response.data;
+    const response = await callBaseQuery({ url: '/users', method: 'GET' });
+    // const response = await axios.get<IUser[]>(`${baseUrl}/users`, {
+    //   params: { _limit: limit, _page: page },
+    // });
+    // return response.data;
+    return response.data as IUser[];
   } catch (e) {
-    return thunkAPI.rejectWithValue('Error in load users request');
+    return rejectWithValue('Error in load users request');
   }
 });
 

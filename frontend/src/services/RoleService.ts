@@ -1,7 +1,7 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IPost } from '../models/IPost.ts';
 import type { IRole } from '../models/IRole.ts';
-import { baseUrl } from '../shared/constants/baseConfig.ts';
+import { baseQueryWithReauth } from '@/baseQuery.ts';
 
 interface FetchRolesArgs {
   limit?: number;
@@ -10,7 +10,7 @@ interface FetchRolesArgs {
 
 export const roleAPI = createApi({
   reducerPath: 'roleAPI',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ['Role'],
   endpoints: (build) => ({
     fetchRoles: build.query<IRole[], FetchRolesArgs>({

@@ -1,29 +1,45 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import {
-  useCreatePostMutation,
   useDeletePostMutation,
   useFetchPostsQuery,
   useUpdatePostMutation,
-} from '../../../services/PostService.ts';
+} from '@/services/PostService.ts';
 import PostItem from './PostItem.tsx';
-import type { IPost } from '../../../models/IPost.ts';
-import PostPagination from './PostPagination.tsx';
+import type { IPost } from '@/models/IPost.ts';
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow
+} from '@mui/material';
+import * as React from 'react';
+
+const rowsPerPageOptions = [
+  {
+    value: 5,
+    label: '5',
+  },
+  {
+    value: 10,
+    label: '10',
+  },
+  {
+    value: 20,
+    label: '20',
+  }
+];
 
 const PostContainer = () => {
-  const [limit] = useState(100);
+  const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
-  const { data: posts, error, isLoading } = useFetchPostsQuery({ limit, page });
-  const [createPost] = useCreatePostMutation();
+  const { data, error, isLoading } = useFetchPostsQuery({ limit, page });
   const [updatePost] = useUpdatePostMutation();
   const [deletePost] = useDeletePostMutation();
-  const totalPages = 5;
-
-  console.log('PostContainer render');
-
-  const handleCreate = async () => {
-    const title = prompt();
-    await createPost({ title, body: title } as IPost);
-  };
+  const { data: rows,  pageSize, totalItems } = data || {};
 
   const handleRemove = (post: IPost) => {
     deletePost(post);
@@ -33,26 +49,54 @@ const PostContainer = () => {
     updatePost(post);
   };
 
-  const handlePrev = useCallback(() => {
-    setPage((prev) => Math.max(prev - 1, 1));
-  }, []);
+  const handlePageChange = (_: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, page: number) => {
+    setPage(page + 1);
+  };
 
-  const handleNext = useCallback(() => {
-    setPage((prev) => Math.min(prev + 1, totalPages));
-  }, []);
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    const newPageSize = parseInt(event.target.value, 10);
+    setLimit(newPageSize);
+    setPage(1);
+  };
 
   return (
     <div>
       <div className='post__list'>
-        <button onClick={handleCreate}>Add new post</button>
-        {isLoading && <h1>Идет загрузка...</h1>}
-        {error && <h1>Произошла ошибка при загрузке</h1>}
-        {posts &&
-          posts.map((post: IPost) => (
-            <PostItem remove={handleRemove} update={handleUpdate} key={post.id} post={post} />
-          ))}
+        {isLoading && <h1>Loading...</h1>}
+        {error && <h1>Some error</h1>}
+        {rows &&
+          <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 220px)', mb: 2 }}>
+            <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Image</TableCell>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Content</TableCell>
+                  <TableCell align="center">Created At</TableCell>
+                  <TableCell align="center">Updated At</TableCell>
+                  <TableCell align="right">Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((post: IPost) => (
+                  <PostItem remove={handleRemove} update={handleUpdate} key={post.id} post={post} />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+      }
       </div>
-      <PostPagination page={page} totalPages={totalPages} onPrev={handlePrev} onNext={handleNext} />
+      <TablePagination
+        component="div"
+        count={totalItems}
+        page={page - 1}
+        rowsPerPageOptions={rowsPerPageOptions}
+        onPageChange={handlePageChange}
+        rowsPerPage={pageSize || limit}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </div>
   );
 };

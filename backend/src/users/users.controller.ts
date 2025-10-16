@@ -22,17 +22,17 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Получить всех пользователей' })
   @ApiResponse({ status: 200, type: [User] })
-  // @Roles("ADMIN")
-  // @UseGuards(RolesGuard)
+  @Roles('Admin')
+  @UseGuards(RolesGuard)
   @Get()
   getAll() {
     return this.usersService.getAllUsers();
   }
 
-  @ApiOperation({ summary: 'Получить всех пользователей' })
+  @ApiOperation({ summary: 'Получить пользователя' })
   @ApiResponse({ status: 200, type: [User] })
-  // @Roles("ADMIN")
-  // @UseGuards(RolesGuard)
+  @Roles('Admin')
+  @UseGuards(RolesGuard)
   @Get(`/:id`)
   get(@Param('id') id: number) {
     return this.usersService.getUserById(id);

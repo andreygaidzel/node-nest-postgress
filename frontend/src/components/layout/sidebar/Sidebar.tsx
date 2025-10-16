@@ -12,6 +12,9 @@ function Sidebar() {
         <NavLink className={styles.sidebarLink} to='/products'>
           Products
         </NavLink>
+        <NavLink className={styles.sidebarLink} to='/posts'>
+          Posts
+        </NavLink>
         <NavLink className={styles.sidebarLink} to='/users'>
           Users
         </NavLink>
