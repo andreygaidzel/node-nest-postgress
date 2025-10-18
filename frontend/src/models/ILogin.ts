@@ -1,4 +1,5 @@
 
 export interface ILogin {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
 }

@@ -31,19 +31,23 @@ export class RolesGuard implements CanActivate {
       }
       const req = context.switchToHttp().getRequest();
       const authHeader = req.headers.authorization;
+
       const bearer = authHeader.split(' ')[0];
       const token = authHeader.split(' ')[1];
-
       if (bearer !== 'Bearer' || !token) {
         throw new UnauthorizedException({
           message: 'User are not authorized',
         });
       }
 
-      req.user = this.jwtService.verify(token);
-      console.log(123, req.user.roles, requiredRoles);
+      req.user = this.jwtService.verify(token, {
+        secret: process.env.JWT_ACCESS_SECRET,
+      });
       return req.user.roles.some((role) => requiredRoles.includes(role));
     } catch (e) {
+      if (e.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token is expired');
+      }
       throw new HttpException('No access', HttpStatus.FORBIDDEN);
     }
   }

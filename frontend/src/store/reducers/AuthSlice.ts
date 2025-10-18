@@ -2,7 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { login } from './ActionCreators';
 import type { ILogin } from '@/models/ILogin.ts';
 import { decodeJwt, type IUserTokenData } from '@/utils/token.ts';
-import { JWT_KEY } from '@/services/AuthService/AuthService.const.ts';
+import { JWT_KEY, JWT_KEY_REFRESH } from '@/services/AuthService/AuthService.const.ts';
 
 interface AuthState {
   user: IUserTokenData | null;
@@ -18,6 +18,7 @@ if (token) {
     userFromToken = decodeJwt(token);
   } catch {
     localStorage.removeItem(JWT_KEY);
+    localStorage.removeItem(JWT_KEY_REFRESH);
   }
 }
 
@@ -34,6 +35,7 @@ export const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       localStorage.removeItem(JWT_KEY);
+      localStorage.removeItem(JWT_KEY_REFRESH);
     },
   },
   extraReducers: (builder) => {
@@ -44,8 +46,9 @@ export const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action: PayloadAction<ILogin>) => {
         state.isLoading = false;
         state.error = '';
-        state.user = decodeJwt(action.payload.token);
-        localStorage.setItem(JWT_KEY, action.payload.token);
+        state.user = decodeJwt(action.payload.accessToken);
+        localStorage.setItem(JWT_KEY, action.payload.accessToken);
+        localStorage.setItem(JWT_KEY_REFRESH, action.payload.refreshToken);
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;

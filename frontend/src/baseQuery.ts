@@ -1,7 +1,8 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import { JWT_KEY } from '@/services/AuthService/AuthService.const.ts';
+import { JWT_KEY, JWT_KEY_REFRESH } from '@/services/AuthService/AuthService.const.ts';
 import { baseUrl } from '@/shared/constants/baseConfig.ts';
+import type { ILogin } from '@/models/ILogin.ts';
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl,
@@ -17,11 +18,25 @@ export const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, Fetch
     let result = await rawBaseQuery(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {
-      const refreshResult = await rawBaseQuery('/auth/refresh', api, extraOptions);
+      const refreshToken = localStorage.getItem(JWT_KEY_REFRESH);
+      if (!refreshToken) {
+        api.dispatch({ type: 'auth/logout' });
+        return result;
+      }
+
+      const refreshResult = await rawBaseQuery(
+        {
+          url: '/auth/refresh',
+          method: 'POST',
+          body: { refreshToken },
+        },
+        api, extraOptions);
 
       if (refreshResult.data) {
-        const newToken = (refreshResult.data as { token: string }).token;
-        localStorage.setItem(JWT_KEY, newToken);
+        const { accessToken, refreshToken: newRefreshToken } = refreshResult.data as ILogin;
+        localStorage.setItem(JWT_KEY, accessToken);
+        localStorage.setItem(JWT_KEY_REFRESH, newRefreshToken);
+
         result = await rawBaseQuery(args, api, extraOptions);
       } else {
         api.dispatch({ type: 'auth/logout' });

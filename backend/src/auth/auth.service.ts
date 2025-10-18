@@ -19,7 +19,7 @@ export class AuthService {
 
   async login(userDto: CreateUserDto) {
     const user = await this.validateUser(userDto);
-    return this.generateToken(user);
+    return this.generateTokens(user);
   }
 
   // async registration(userDto: CreateUserDto) {
@@ -32,14 +32,62 @@ export class AuthService {
   //   return this.generateToken(user)
   // }
 
-  private async generateToken(user: User) {
+  async refreshTokens(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
+
+      const user = await this.userService.getUserById(payload.id);
+      if (!user) {
+        throw new UnauthorizedException('User not exist');
+      }
+
+      const newAccessToken = this.jwtService.sign(
+        { id: user.id, email: user.email, roles: user.roles },
+        { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '1d' },
+      );
+
+      const newRefreshToken = this.jwtService.sign(
+        { id: user.id },
+        { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' },
+      );
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Refresh token is expired');
+      }
+      throw new UnauthorizedException('Wrong refresh token');
+    }
+  }
+
+  private async generateTokens(user: User) {
     const payload = {
       email: user.email,
       id: user.id,
       roles: user.roles.map((role) => role.value),
     };
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_ACCESS_SECRET,
+      expiresIn: '1d',
+    });
+
+    const refreshToken = this.jwtService.sign(
+      { id: user.id },
+      {
+        secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: '7d',
+      },
+    );
+
     return {
-      token: this.jwtService.sign(payload),
+      accessToken,
+      refreshToken,
     };
   }
 

@@ -4,42 +4,83 @@ import {
   useFetchPostsQuery,
   useUpdatePostMutation,
 } from '@/services/PostService.ts';
-import PostItem from './PostItem.tsx';
 import type { IPost } from '@/models/IPost.ts';
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow
-} from '@mui/material';
 import * as React from 'react';
+import type { ITableView } from '@/components/shared/table/TableView.model.ts';
+import CTable from '@/components/shared/table/Table.tsx';
+import { baseUrl } from '@/shared/constants/baseConfig.ts';
+import { Box, Tooltip } from '@mui/material';
 
-const rowsPerPageOptions = [
-  {
-    value: 5,
-    label: '5',
-  },
-  {
-    value: 10,
-    label: '10',
-  },
-  {
-    value: 20,
-    label: '20',
-  }
-];
+const tableModel: ITableView = {
+  columns: [
+    {
+      columnKey: 'image',
+      header: 'Image',
+      templateFn: (column, item) => (
+        <Box
+          component="img"
+          src={`${baseUrl}/${item[column.columnKey]}`}
+          alt={item[column.columnKey]}
+          sx={{
+            width: 90,
+            height: 90,
+            borderRadius: 2,
+            objectFit: 'cover',
+            boxShadow: 1,
+          }}
+        />
+      )
+    },
+    {
+      columnKey: 'title',
+      header: 'Title',
+      isSort: true,
+      isFilter: true,
+      type: 'text',
+      sx: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', cursor: "default", maxWidth: '200px' },
+      templateFn: (column, item) => (
+        <Tooltip title={item[column.columnKey]}>
+          <span>{item[column.columnKey]}</span>
+        </Tooltip>
+      )
+    },
+    {
+      columnKey: 'content',
+      header: 'Content',
+      isSort: true,
+      isFilter: true,
+      type: 'text',
+    },
+    {
+      columnKey: 'createdAt',
+      header: 'Created At',
+      align: 'center',
+      isSort: true,
+      isFilter: true,
+      type: 'date',
+      sx: { whiteSpace: 'nowrap'}
+    },
+    {
+      columnKey: 'updatedAt',
+      header: 'Updated At',
+      align: 'center',
+      isSort: true,
+      isFilter: true,
+      type: 'date',
+      sx: { whiteSpace: 'nowrap'}
+    }
+  ]
+};
 
-const PostContainer = () => {
+const PostContainer: React.FC = () => {
+
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+  // const [filter, setFilter] = useState<string>('');
   const { data, error, isLoading } = useFetchPostsQuery({ limit, page });
   const [updatePost] = useUpdatePostMutation();
   const [deletePost] = useDeletePostMutation();
-  const { data: rows,  pageSize, totalItems } = data || {};
+  const { data: rows, pageSize, totalItems } = data || {};
 
   const handleRemove = (post: IPost) => {
     deletePost(post);
@@ -49,55 +90,30 @@ const PostContainer = () => {
     updatePost(post);
   };
 
-  const handlePageChange = (_: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, page: number) => {
-    setPage(page + 1);
-  };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    const newPageSize = parseInt(event.target.value, 10);
-    setLimit(newPageSize);
-    setPage(1);
-  };
+
+  // const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setFilter(event.target.value);
+  //   setPage(0);
+  // };
 
   return (
-    <div>
-      <div className='post__list'>
-        {isLoading && <h1>Loading...</h1>}
-        {error && <h1>Some error</h1>}
-        {rows &&
-          <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 220px)', mb: 2 }}>
-            <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Image</TableCell>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Content</TableCell>
-                  <TableCell align="center">Created At</TableCell>
-                  <TableCell align="center">Updated At</TableCell>
-                  <TableCell align="right">Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((post: IPost) => (
-                  <PostItem remove={handleRemove} update={handleUpdate} key={post.id} post={post} />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-      }
-      </div>
-      <TablePagination
-        component="div"
-        count={totalItems}
-        page={page - 1}
-        rowsPerPageOptions={rowsPerPageOptions}
-        onPageChange={handlePageChange}
-        rowsPerPage={pageSize || limit}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+    <>
+      <CTable<IPost>
+        tableModel={tableModel}
+        error={error && JSON.stringify(error)}
+        isLoading={isLoading}
+        rows={rows}
+        limit={limit}
+        page={page}
+        pageSize={pageSize}
+        totalItems={totalItems}
+        handleRemove={handleRemove}
+        handleUpdate={handleUpdate}
+        setLimit={setLimit}
+        setPage={setPage}
       />
-    </div>
+    </>
   );
 };
 

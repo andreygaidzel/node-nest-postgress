@@ -1,10 +1,10 @@
-import './Header.scss'
+import styles from './Header.module.scss'
 
 function Header() {
   return (
-    <div className="header">
-      <div className="header-left">
-        <i className="header-left__logo">React Store</i>
+    <div className={styles.header}>
+      <div className={styles.headerLeft}>
+        <i className={styles.headerLeft__logo}>React Store</i>
       </div>
     </div>
   );
