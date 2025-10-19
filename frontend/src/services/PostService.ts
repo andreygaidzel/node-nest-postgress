@@ -2,10 +2,13 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IPost } from '../models/IPost.ts';
 import { baseQueryWithReauth } from '@/baseQuery.ts';
 import type { IPaginatedList } from '@/models/IPaginatedList.ts';
+import { mapFilters } from '@/utils/filters.ts';
 
 interface FetchPostsArgs {
   limit?: number;
   page?: number;
+  sort?: string;
+  filter?: Record<string, string>
 }
 
 export const postAPI = createApi({
@@ -14,11 +17,13 @@ export const postAPI = createApi({
   tagTypes: ['Post'],
   endpoints: (build) => ({
     fetchPosts: build.query<IPaginatedList<IPost>, FetchPostsArgs>({
-      query: ({ limit = 5, page = 1 }) => ({
+      query: ({ limit = 5, page = 1, sort, filter }) => ({
         url: `/posts`,
         params: {
           pageSize: limit,
           page: page,
+          sort,
+          filter: mapFilters(filter)
         },
       }),
       providesTags: () => ['Post'],

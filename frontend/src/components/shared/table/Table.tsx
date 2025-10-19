@@ -41,9 +41,31 @@ interface ChildProps<T extends { id: string | number }> {
   handleUpdate: (item: T) => void;
   setLimit: (page: number) => void;
   setPage: (page: number) => void;
+  sort: string;
+  filter: Record<string, string>;
+  setSort: React.Dispatch<React.SetStateAction<string>>;
+  handleFilterChange: (filter: Record<string, string>) => void;
 }
 
-function CTable<T extends { id: string | number }>({ tableModel, error, isLoading, rows, page, limit, handleRemove, handleUpdate, totalItems, pageSize, setLimit, setPage }: ChildProps<T>) {
+function CTable<T extends { id: string | number }>(
+  {
+    tableModel,
+    error,
+    isLoading,
+    rows,
+    page,
+    limit,
+    handleRemove,
+    handleUpdate,
+    totalItems,
+    pageSize,
+    setLimit,
+    setPage,
+    sort,
+    filter,
+    setSort,
+    handleFilterChange
+  }: ChildProps<T>) {
   const handlePageChange = (_: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, page: number) => {
     setPage(page + 1);
   };
@@ -59,21 +81,33 @@ function CTable<T extends { id: string | number }>({ tableModel, error, isLoadin
   return (
     <>
       {isLoading && <h1>Loading...</h1>}
-      {error && <h1>Some error {error}</h1>}
+      {error && <h3>Some error {error}</h3>}
       {rows &&
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 220px)', mb: 2 }}>
           <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
                 {tableModel.columns.map((column) => (
-                  <TableHeaderColumn column={column} key={column.columnKey}/>
+                  <TableHeaderColumn
+                    key={column.columnKey}
+                    column={column}
+                    sort={sort}
+                    filter={filter}
+                    setSort={setSort}
+                    handleFilterChange={handleFilterChange}
+                  />
                 ))}
                 <TableCell align="right">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.map((item: T) => (
-                <MemoizedCTableRow remove={handleRemove} update={handleUpdate} key={item.id} item={item} columns={tableModel.columns}/>
+                <MemoizedCTableRow
+                  key={item.id}
+                  remove={handleRemove}
+                  update={handleUpdate}
+                  item={item}
+                  columns={tableModel.columns}/>
               ))}
             </TableBody>
           </Table>

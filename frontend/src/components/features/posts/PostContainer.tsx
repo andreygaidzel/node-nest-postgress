@@ -73,11 +73,11 @@ const tableModel: ITableView = {
 };
 
 const PostContainer: React.FC = () => {
-
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
-  // const [filter, setFilter] = useState<string>('');
-  const { data, error, isLoading } = useFetchPostsQuery({ limit, page });
+  const [filter, setFilter] = useState<Record<string, string>>({});
+  const [sort, setSort] = useState<string>('title.asc');
+  const { data, error, isLoading } = useFetchPostsQuery({ limit, page, sort, filter });
   const [updatePost] = useUpdatePostMutation();
   const [deletePost] = useDeletePostMutation();
   const { data: rows, pageSize, totalItems } = data || {};
@@ -90,12 +90,11 @@ const PostContainer: React.FC = () => {
     updatePost(post);
   };
 
-
-
-  // const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFilter(event.target.value);
-  //   setPage(0);
-  // };
+  const handleFilterChange = (filters: Record<string, string>) => {
+    console.log(filters);
+    setFilter(filters);
+    setPage(1);
+  };
 
   return (
     <>
@@ -112,6 +111,10 @@ const PostContainer: React.FC = () => {
         handleUpdate={handleUpdate}
         setLimit={setLimit}
         setPage={setPage}
+        sort={sort}
+        filter={filter}
+        setSort={setSort}
+        handleFilterChange={handleFilterChange}
       />
     </>
   );

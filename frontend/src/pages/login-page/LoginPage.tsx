@@ -33,8 +33,6 @@ const LoginPage: FC = () => {
       return;
     }
     setError('');
-    console.log('Отправляем данные:', { email, password });
-
     dispatch(login({ email, password }));
   };
 

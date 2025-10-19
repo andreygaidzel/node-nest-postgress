@@ -37,9 +37,11 @@ export class PostsController {
   getAll(
     @Query('page') page: string,
     @Query('pageSize') pageSize: string,
+    @Query('sort') sort: string,
+    @Query('filter') filter: string,
   ): Promise<PaginatedList<IBPost>> {
     const iPage = page ? parseInt(page, 10) : 1;
     const iPageSize = pageSize ? parseInt(pageSize, 10) : 10;
-    return this.postService.getAllPosts(iPage, iPageSize);
+    return this.postService.getAllPosts(iPage, iPageSize, sort, filter);
   }
 }

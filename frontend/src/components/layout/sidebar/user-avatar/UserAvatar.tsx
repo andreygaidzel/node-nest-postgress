@@ -26,7 +26,7 @@ const UserAvatar: FC = () => {
   const { email } = userFromStore as IUserTokenData;
 
   const user = {
-    name: email.split('@')[0],
+    name: email?.split('@')[0],
     email,
   };
 
@@ -44,7 +44,7 @@ const UserAvatar: FC = () => {
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <IconButton onClick={handleClick} size="small">
           <Avatar sx={{ width: 56, height: 56 }}>
-            {user.name.charAt(0).toUpperCase()}
+            {user.name?.charAt(0).toUpperCase()}
           </Avatar>
         </IconButton>
 

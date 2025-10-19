@@ -4,7 +4,7 @@ import * as React from 'react';
 
 interface ChildProps {
   filterValues: Record<string, string>;
-  setFilterValues: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setFilterValues: (filter: Record<string, string>) => void;
   anchorEls: Record<string, HTMLElement | null>;
   setAnchorEls: React.Dispatch<React.SetStateAction<Record<string, HTMLElement | null>>>;
   filterKey: string;
@@ -21,13 +21,16 @@ const TableFilter: React.FC<ChildProps> = ({ filterValues, setFilterValues, anch
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    setFilterValues((prev) => ({ ...prev, [key]: value }));
+    setFilterValues(({ ...filterValues, [key]: value }));
   };
 
+  console.log(filterKey, filterValues);
   return (
     <>
-      <IconButton size='small' onClick={(e) => handleOpenFilter(e, filterKey)}>
-        <FilterList fontSize="small" />
+      <IconButton
+        size='small'
+        onClick={(e) => handleOpenFilter(e, filterKey)}>
+        <FilterList sx={filterValues[filterKey] ? { fill: 'red' } : {}} fontSize="small" />
       </IconButton>
       <Popover
         open={Boolean(anchorEls[filterKey])}
