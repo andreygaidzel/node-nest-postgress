@@ -2,7 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { login } from './ActionCreators';
 import type { ILogin } from '@/models/ILogin.ts';
 import { decodeJwt, type IUserTokenData } from '@/utils/token.ts';
-import { JWT_KEY, JWT_KEY_REFRESH } from '@/services/AuthService/AuthService.const.ts';
+import { JWT_KEY, JWT_KEY_REFRESH } from '@/shared/constants/baseConfig.ts';
 
 interface AuthState {
   user: IUserTokenData | null;

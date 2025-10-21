@@ -2,7 +2,6 @@ import { type FC, type ReactNode } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { ErrorBoundaryPage } from '@/pages/error-boundary-page/ErrorBoundaryPage.tsx';
 import Paths from '@/utils/paths.ts';
-import type { TRole } from '@/services/AuthService/AuthService.model.ts';
 import Sidebar from '@/components/layout/sidebar/Sidebar.tsx';
 import HomePage from '@/pages/home-page/HomePage.tsx';
 import ProductsPage from '@/pages/products-page/ProductsPage.tsx';
@@ -16,6 +15,7 @@ import NotFoundPage from '@/pages/not-found-page/NotFoundPage.tsx';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store.ts';
 import PostsPage from '@/pages/posts-page/PostsPage.tsx';
+import type { TRole } from '@/models/IUserRoles.ts';
 
 export interface IRoute {
   path: string;

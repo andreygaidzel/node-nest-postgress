@@ -77,13 +77,10 @@ export class AuthService {
       expiresIn: '1d',
     });
 
-    const refreshToken = this.jwtService.sign(
-      { id: user.id },
-      {
-        secret: process.env.JWT_REFRESH_SECRET,
-        expiresIn: '7d',
-      },
-    );
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
+    });
 
     return {
       accessToken,
@@ -99,7 +96,7 @@ export class AuthService {
       return user;
     }
     throw new UnauthorizedException({
-      message: 'Некорректный емайл или пароль',
+      message: 'Unknown password or email',
     });
   }
 }

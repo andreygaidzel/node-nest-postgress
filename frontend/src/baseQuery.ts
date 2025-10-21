@@ -1,7 +1,6 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import { JWT_KEY, JWT_KEY_REFRESH } from '@/services/AuthService/AuthService.const.ts';
-import { baseUrl } from '@/shared/constants/baseConfig.ts';
+import { baseUrl, JWT_KEY, JWT_KEY_REFRESH } from '@/shared/constants/baseConfig.ts';
 import type { ILogin } from '@/models/ILogin.ts';
 
 const rawBaseQuery = fetchBaseQuery({

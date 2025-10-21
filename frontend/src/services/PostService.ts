@@ -3,26 +3,21 @@ import type { IPost } from '../models/IPost.ts';
 import { baseQueryWithReauth } from '@/baseQuery.ts';
 import type { IPaginatedList } from '@/models/IPaginatedList.ts';
 import { mapFilters } from '@/utils/filters.ts';
-
-interface FetchPostsArgs {
-  limit?: number;
-  page?: number;
-  sort?: string;
-  filter?: Record<string, string>
-}
+import type { IFetchTableParams } from '@/models/IFetchTableParams.ts';
+import { mapSortValue } from '@/utils/sort.ts';
 
 export const postAPI = createApi({
   reducerPath: 'postAPI',
   baseQuery: baseQueryWithReauth,
   tagTypes: ['Post'],
   endpoints: (build) => ({
-    fetchPosts: build.query<IPaginatedList<IPost>, FetchPostsArgs>({
-      query: ({ limit = 5, page = 1, sort, filter }) => ({
+    fetchPosts: build.query<IPaginatedList<IPost>, IFetchTableParams>({
+      query: ({ pageSize = 5, page = 1, sort, filter }) => ({
         url: `/posts`,
         params: {
-          pageSize: limit,
-          page: page,
-          sort,
+          pageSize,
+          page,
+          sort: mapSortValue(sort),
           filter: mapFilters(filter)
         },
       }),

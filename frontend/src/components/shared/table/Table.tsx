@@ -12,70 +12,59 @@ import {
 import TableHeaderColumn from '@/components/shared/table/table-header-column/TableHeaderColumn.tsx';
 import * as React from 'react';
 import MemoizedCTableRow from '@/components/shared/table/table-row/TableRow.tsx';
+import { useAppDispatch } from '@/hooks/redux.ts';
+import type { IFetchTableParams, ISortModel } from '@/models/IFetchTableParams.ts';
+import type { IPaginatedList } from '@/models/IPaginatedList.ts';
+import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import { ROWS_PER_PAGE_OPTIONS } from '@/components/shared/table/Table.const.ts';
+import { useDebounce } from '@/utils/debounce.ts';
 
-const rowsPerPageOptions = [
-  {
-    value: 5,
-    label: '5',
-  },
-  {
-    value: 10,
-    label: '10',
-  },
-  {
-    value: 20,
-    label: '20',
-  }
-];
+interface TableActions {
+  setPage: ActionCreatorWithPayload<number, string>;
+  setPageSize: ActionCreatorWithPayload<number, string>;
+  setSort: ActionCreatorWithPayload<ISortModel, string>;
+  setFilter: ActionCreatorWithPayload<Record<string, string>, string>;
+}
 
 interface ChildProps<T extends { id: string | number }> {
   tableModel: ITableView;
-  error: string | undefined;
-  isLoading: boolean;
-  rows: T[] | undefined;
-  totalItems: number | undefined;
-  pageSize: number | undefined;
-  page: number;
-  limit: number;
   handleRemove: (item: T) => void;
   handleUpdate: (item: T) => void;
-  setLimit: (page: number) => void;
-  setPage: (page: number) => void;
-  sort: string;
-  filter: Record<string, string>;
-  setSort: React.Dispatch<React.SetStateAction<string>>;
-  handleFilterChange: (filter: Record<string, string>) => void;
+  sliceActions: TableActions,
+  useFetchQuery: (args: IFetchTableParams) => { data?: IPaginatedList<T>; isLoading: boolean; error?: any };
+  stateSelector: IFetchTableParams;
 }
 
 function CTable<T extends { id: string | number }>(
   {
     tableModel,
-    error,
-    isLoading,
-    rows,
-    page,
-    limit,
     handleRemove,
     handleUpdate,
-    totalItems,
-    pageSize,
-    setLimit,
-    setPage,
-    sort,
-    filter,
-    setSort,
-    handleFilterChange
+    sliceActions,
+    useFetchQuery,
+    stateSelector,
   }: ChildProps<T>) {
+  const dispatch = useAppDispatch();
+  const { page, pageSize, sort, filter } = stateSelector;
+  const debouncedFilter = useDebounce<Record<string, string>>(filter, 500);
+  const { data, isLoading, error } = useFetchQuery({
+    page,
+    pageSize,
+    sort,
+    filter: debouncedFilter,
+  });
+  const { data: rows, totalItems } = data || {};
+  const { setSort, setPage, setPageSize, setFilter } = sliceActions;
+
   const handlePageChange = (_: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, page: number) => {
-    setPage(page + 1);
+    dispatch(setPage(page + 1));
   };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     const newPageSize = parseInt(event.target.value, 10);
-    setLimit(newPageSize);
-    setPage(1);
+    dispatch(setPageSize(newPageSize));
   };
 
   return (
@@ -94,7 +83,7 @@ function CTable<T extends { id: string | number }>(
                     sort={sort}
                     filter={filter}
                     setSort={setSort}
-                    handleFilterChange={handleFilterChange}
+                    setFilter={setFilter}
                   />
                 ))}
                 <TableCell align="right">Action</TableCell>
@@ -117,9 +106,9 @@ function CTable<T extends { id: string | number }>(
         component="div"
         count={totalItems || 0}
         page={page - 1}
-        rowsPerPageOptions={rowsPerPageOptions}
+        rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
         onPageChange={handlePageChange}
-        rowsPerPage={pageSize || limit}
+        rowsPerPage={pageSize}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </>

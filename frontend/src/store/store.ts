@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './reducers/UserSlice';
 import authReducer from './reducers/AuthSlice';
+import postsReducer from './reducers/PostSlice';
 import { postAPI } from '../services/PostService';
 import { roleAPI } from '../services/RoleService.ts';
 
@@ -11,6 +12,7 @@ export const setupStore = () => {
       auth: authReducer,
       [postAPI.reducerPath]: postAPI.reducer,
       [roleAPI.reducerPath]: roleAPI.reducer,
+      posts: postsReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(postAPI.middleware).concat(roleAPI.middleware),

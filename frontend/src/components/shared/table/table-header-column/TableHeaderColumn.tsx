@@ -1,56 +1,50 @@
 import { Box, TableCell, TableSortLabel } from '@mui/material';
 import TableFilter from '@/components/shared/table/table-filter/TableFilter.tsx';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { ITableColumn } from '@/components/shared/table/TableView.model.ts';
-
-type Order = 'asc' | 'desc';
+import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import { useAppDispatch } from '@/hooks/redux.ts';
+import { type ISortModel, SORT_ORDERS } from '@/models/IFetchTableParams.ts';
 
 interface ChildProps {
   column: ITableColumn;
-  sort: string;
+  sort: ISortModel;
   filter: Record<string, string>;
-  setSort: React.Dispatch<React.SetStateAction<string>>;
-  handleFilterChange: (filter: Record<string, string>) => void;
+  setSort: ActionCreatorWithPayload<ISortModel, string>;
+  setFilter: ActionCreatorWithPayload<Record<string, string>, string>;
 }
 
 const TableHeaderColumn: React.FC<ChildProps> = (
   {
     column: { columnKey, header, align, isSort, isFilter },
-    sort, filter, setSort, handleFilterChange
+    sort, filter, setSort, setFilter
   }) => {
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<string>(columnKey);
+  const dispatch = useAppDispatch();
   const [anchorEls, setAnchorEls] = useState<Record<string, HTMLElement | null>>({});
+  const {field, order} = sort;
 
-  const handleRequestSort = (property: string) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-    setSort(`${property}.${order}`)
+  const handleRequestSort = () => {
+    const isAsc = field === columnKey && order === SORT_ORDERS.ASC;
+    dispatch(setSort({
+      field: columnKey,
+      order: isAsc ? SORT_ORDERS.DESC : SORT_ORDERS.ASC
+    }));
   };
-
-  useEffect(() => {
-    if (sort) {
-      const [property, order] = sort.split('.');
-      setOrder(order as Order);
-      setOrderBy(property);
-    }
-  }, [sort]);
 
   return (
     <TableCell align={align}>
       <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
         {isSort ? <TableSortLabel
-          active={orderBy === columnKey}
-          direction={orderBy === columnKey ? order : 'asc'}
-          onClick={() => handleRequestSort(columnKey)}
+          active={field === columnKey}
+          direction={field === columnKey ? order : SORT_ORDERS.ASC}
+          onClick={handleRequestSort}
         >
           {header}
         </TableSortLabel> : <>{header}</>}
         {isFilter && <TableFilter
-          filterValues={filter}
-          setFilterValues={handleFilterChange}
+          filter={filter}
+          setFilter={setFilter}
           anchorEls={anchorEls}
           setAnchorEls={setAnchorEls}
           filterKey={columnKey}
