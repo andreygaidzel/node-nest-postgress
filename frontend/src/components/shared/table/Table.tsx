@@ -70,7 +70,7 @@ function CTable<T extends { id: string | number }>(
   return (
     <>
       {isLoading && <h1>Loading...</h1>}
-      {error && <h3>Some error {error}</h3>}
+      {error && <h3>Some error {JSON.stringify(error)}</h3>}
       {rows &&
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 220px)', mb: 2 }}>
           <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">

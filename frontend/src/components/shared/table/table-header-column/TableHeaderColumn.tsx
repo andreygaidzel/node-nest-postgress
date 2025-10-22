@@ -2,7 +2,7 @@ import { Box, TableCell, TableSortLabel } from '@mui/material';
 import TableFilter from '@/components/shared/table/table-filter/TableFilter.tsx';
 import * as React from 'react';
 import { useState } from 'react';
-import type { ITableColumn } from '@/components/shared/table/TableView.model.ts';
+import { type ITableColumn } from '@/components/shared/table/TableView.model.ts';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { useAppDispatch } from '@/hooks/redux.ts';
 import { type ISortModel, SORT_ORDERS } from '@/models/IFetchTableParams.ts';
@@ -17,7 +17,7 @@ interface ChildProps {
 
 const TableHeaderColumn: React.FC<ChildProps> = (
   {
-    column: { columnKey, header, align, isSort, isFilter },
+    column: { columnKey, header, align, isSort, isFilter, type },
     sort, filter, setSort, setFilter
   }) => {
   const dispatch = useAppDispatch();
@@ -48,6 +48,7 @@ const TableHeaderColumn: React.FC<ChildProps> = (
           anchorEls={anchorEls}
           setAnchorEls={setAnchorEls}
           filterKey={columnKey}
+          type={type}
         />}
       </Box>
     </TableCell>
