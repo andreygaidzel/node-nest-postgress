@@ -1,18 +1,19 @@
 import React, { type JSX } from 'react';
-import { IconButton, TableCell, TableRow } from '@mui/material';
+import { IconButton, TableCell, TableRow as MatTableRow } from '@mui/material';
 import { viewDateFormat } from '@/shared/constants/baseConfig.ts';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
-import type { ITableColumn } from '@/components/shared/table/TableView.model.ts';
+import type { TableEntity, ITableColumn } from '@/components/shared/table/TableView.model.ts';
+import styles from './TableRow.module.scss';
 
-interface ChildProps<T extends Record<string, string | number | undefined>> {
+interface TableRowProps<T extends TableEntity> {
   item: T;
   columns: ITableColumn[]
   remove: (item: T) => void;
   update?: (item: T) => void;
 }
 
-function CTableRow<T extends Record<string, string | number | undefined>>({ item, remove, columns }: ChildProps<T>) {
+function TableRow<T extends TableEntity>({ item, remove, columns }: TableRowProps<T>) {
   const handleRemove = (event: React.MouseEvent) => {
     event.stopPropagation();
     remove(item);
@@ -27,7 +28,7 @@ function CTableRow<T extends Record<string, string | number | undefined>>({ item
   // };
 
   return (
-    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+    <MatTableRow className={styles.tableRow}>
       {
         columns.map((column) => (
           <TableCell key={column.columnKey} sx={column.sx}>
@@ -47,12 +48,12 @@ function CTableRow<T extends Record<string, string | number | undefined>>({ item
           <DeleteIcon />
         </IconButton>
       </TableCell>
-    </TableRow>
+    </MatTableRow>
   );
 }
 
-const MemoizedCTableRow = React.memo(CTableRow) as <T extends Record<string, string | number | undefined>>(
-  props: ChildProps<T>
+const MemoizedCTableRow = React.memo(TableRow) as <T extends TableEntity>(
+  props: TableRowProps<T>
 ) => JSX.Element;
 
 export default MemoizedCTableRow;

@@ -6,6 +6,7 @@ import { type ITableColumn } from '@/components/shared/table/TableView.model.ts'
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { useAppDispatch } from '@/hooks/redux.ts';
 import { type ISortModel, SORT_ORDERS } from '@/models/IFetchTableParams.ts';
+import styles from './TableHeaderColumn.module.scss';
 
 interface ChildProps {
   column: ITableColumn;
@@ -22,7 +23,7 @@ const TableHeaderColumn: React.FC<ChildProps> = (
   }) => {
   const dispatch = useAppDispatch();
   const [anchorEls, setAnchorEls] = useState<Record<string, HTMLElement | null>>({});
-  const {field, order} = sort;
+  const { field, order} = sort;
 
   const handleRequestSort = () => {
     const isAsc = field === columnKey && order === SORT_ORDERS.ASC;
@@ -33,15 +34,19 @@ const TableHeaderColumn: React.FC<ChildProps> = (
   };
 
   return (
-    <TableCell align={align}>
-      <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-        {isSort ? <TableSortLabel
-          active={field === columnKey}
-          direction={field === columnKey ? order : SORT_ORDERS.ASC}
-          onClick={handleRequestSort}
-        >
+    <TableCell align={align} className={styles.tableCell}>
+      <Box className={styles.cellContent}>
+        {
+          isSort ?
+          <TableSortLabel
+            active={field === columnKey}
+            direction={field === columnKey ? order : SORT_ORDERS.ASC}
+            onClick={handleRequestSort}
+          >
           {header}
-        </TableSortLabel> : <>{header}</>}
+        </TableSortLabel> :
+          header
+        }
         {isFilter && <TableFilter
           filter={filter}
           setFilter={setFilter}

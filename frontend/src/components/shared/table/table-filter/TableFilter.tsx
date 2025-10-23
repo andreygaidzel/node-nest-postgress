@@ -1,14 +1,22 @@
-import { Box, IconButton, Popover, TextField } from '@mui/material';
+import { IconButton, Popover } from '@mui/material';
 import FilterList from '@mui/icons-material/FilterList';
 import * as React from 'react';
 import { useCallback } from 'react';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { useAppDispatch } from '@/hooks/redux.ts';
 import { TableFilterType } from '@/components/shared/table/TableView.model.ts';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import type { Dayjs } from 'dayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import TableFilterControl from '@/components/shared/table/table-filter/table-filter-control/TableFilterControl.tsx';
+import type { PopoverOrigin } from '@mui/material/Popover';
+
+const anchorOrigin: PopoverOrigin = {
+  vertical: 'bottom',
+  horizontal: 'center',
+}
+
+const transformOrigin: PopoverOrigin = {
+  vertical: 'top',
+  horizontal: 'center',
+}
 
 interface ChildProps {
   filter: Record<string, string>;
@@ -33,57 +41,6 @@ const TableFilter: React.FC<ChildProps> = ({ filter, type, setFilter, anchorEls,
     dispatch(setFilter(({ [key]: value })));
   }, [setFilter]);
 
-  const [startDate, setStartDate] = React.useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = React.useState<Dayjs | null>(null);
-
-  // обработчик изменения начала диапазона
-  const handleStartDateChange = (date: Dayjs | null) => {
-    setStartDate(date);
-
-    // если начальная дата > конечной — сбрасываем конечную
-    if (endDate && date && date.isAfter(endDate)) {
-      setEndDate(null);
-    }
-  };
-
-  const renderFilter = (type: TableFilterType | undefined) => {
-    switch (type) {
-      case TableFilterType.TEXT:
-        return (
-          <div style={{ padding: 8, width: 200 }}>
-            <TextField
-              fullWidth
-              label={`Filter by ${filterKey}`}
-              variant="outlined"
-              size="small"
-              value={filter[filterKey]}
-              onChange={(e) => handleFilterChange(filterKey, e.target.value)}
-            />
-          </div>
-        );
-      case TableFilterType.DATE:
-        return (
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box sx={{ display: 'flex', gap: 2, padding: 1 }}>
-              <DatePicker
-                label="Дата от"
-                value={startDate}
-                onChange={handleStartDateChange}
-              />
-
-              <DatePicker
-                label="Дата до"
-                value={endDate}
-                minDate={startDate || undefined}
-                onChange={(newValue) => setEndDate(newValue)}
-              />
-            </Box>
-          </LocalizationProvider>
-        );
-      default:
-        return null;
-    }
-  }
 
   return (
     <>
@@ -96,16 +53,15 @@ const TableFilter: React.FC<ChildProps> = ({ filter, type, setFilter, anchorEls,
         open={Boolean(anchorEls[filterKey])}
         anchorEl={anchorEls[filterKey]}
         onClose={handleCloseFilter}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
+        anchorOrigin={anchorOrigin}
+        transformOrigin={transformOrigin}
       >
-        {renderFilter(type)}
+        <TableFilterControl
+          type={type}
+          filterKey={filterKey}
+          filter={filter}
+          onFilterChange={handleFilterChange}
+        />
       </Popover>
     </>
   );

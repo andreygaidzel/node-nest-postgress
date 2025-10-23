@@ -1,8 +1,7 @@
 import PostModal from '@/components/features/posts/PostModal.tsx';
 import { useDeletePostMutation, useFetchPostsQuery, useUpdatePostMutation } from '@/services/PostService.ts';
-import { useCallback } from 'react';
 import type { IPost } from '@/models/IPost.ts';
-import CTable from '@/components/shared/table/Table.tsx';
+import Table from '@/components/shared/table/Table.tsx';
 import { PostsActions } from '@/store/reducers/PostSlice.ts';
 import { POSTS_TABLE_MODEL } from '@/pages/posts-page/Posts.const.tsx';
 import { useAppSelector } from '@/hooks/redux.ts';
@@ -13,14 +12,6 @@ function PostsPage() {
   const [deleteItem] = useDeletePostMutation();
   const postsSelector = useAppSelector((state: RootState) => state.posts);
 
-  const handleRemove = useCallback((post: IPost) => {
-    deleteItem(post);
-  }, [deleteItem]);
-
-  const handleUpdate = useCallback((post: IPost) => {
-    updatePost(post);
-  }, [updatePost]);
-
   return (
     <div className='simple-page'>
       <div className='simple-page__header'>
@@ -28,10 +19,10 @@ function PostsPage() {
         <PostModal/>
       </div>
 
-      <CTable<IPost>
+      <Table<IPost>
         tableModel={POSTS_TABLE_MODEL}
-        handleRemove={handleRemove}
-        handleUpdate={handleUpdate}
+        handleRemove={deleteItem}
+        handleUpdate={updatePost}
         sliceActions={PostsActions}
         useFetchQuery={useFetchPostsQuery}
         stateSelector={postsSelector}
