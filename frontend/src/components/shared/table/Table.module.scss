@@ -1,0 +1,6 @@
+
+:global(.MuiPaper-root).tableContainer {
+  max-height: calc(100vh - 220px);
+  margin-bottom: 0.8rem;
+  background-color: var(--backgroundColor);
+}

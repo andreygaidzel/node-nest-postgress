@@ -1,7 +1,7 @@
-import type { ITableView } from '@/components/shared/table/TableView.model.ts';
+import type { TableEntity, ITableView, TableActions } from '@/components/shared/table/TableView.model.ts';
 import {
   Paper,
-  Table,
+  Table as MatTable,
   TableBody,
   TableCell,
   TableContainer,
@@ -13,29 +13,36 @@ import TableHeaderColumn from '@/components/shared/table/table-header-column/Tab
 import * as React from 'react';
 import MemoizedCTableRow from '@/components/shared/table/table-row/TableRow.tsx';
 import { useAppDispatch } from '@/hooks/redux.ts';
-import type { IFetchTableParams, ISortModel } from '@/models/IFetchTableParams.ts';
+import type { IFetchTableParams } from '@/models/IFetchTableParams.ts';
 import type { IPaginatedList } from '@/models/IPaginatedList.ts';
-import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { ROWS_PER_PAGE_OPTIONS } from '@/components/shared/table/Table.const.ts';
 import { useDebounce } from '@/utils/debounce.ts';
+import styles from './Table.module.scss';
 
-interface TableActions {
-  setPage: ActionCreatorWithPayload<number, string>;
-  setPageSize: ActionCreatorWithPayload<number, string>;
-  setSort: ActionCreatorWithPayload<ISortModel, string>;
-  setFilter: ActionCreatorWithPayload<Record<string, string>, string>;
+type ErrorFetch = {
+  isLoading: false;
+  error: any;
 }
 
-interface ChildProps<T extends { id: string | number }> {
+type LoadingFetch = {
+  isLoading: true;
+}
+
+type SuccessFetch<T> = {
+  isLoading: false;
+  data: IPaginatedList<T>;
+}
+
+interface TableProps<T extends TableEntity> {
   tableModel: ITableView;
   handleRemove: (item: T) => void;
   handleUpdate: (item: T) => void;
   sliceActions: TableActions,
-  useFetchQuery: (args: IFetchTableParams) => { data?: IPaginatedList<T>; isLoading: boolean; error?: any };
+  useFetchQuery: (args: IFetchTableParams) => SuccessFetch<T> | LoadingFetch | ErrorFetch;
   stateSelector: IFetchTableParams;
 }
 
-function CTable<T extends { id: string | number }>(
+function Table<T extends TableEntity>(
   {
     tableModel,
     handleRemove,
@@ -43,17 +50,16 @@ function CTable<T extends { id: string | number }>(
     sliceActions,
     useFetchQuery,
     stateSelector,
-  }: ChildProps<T>) {
+  }: TableProps<T>) {
   const dispatch = useAppDispatch();
   const { page, pageSize, sort, filter } = stateSelector;
   const debouncedFilter = useDebounce<Record<string, string>>(filter, 500);
-  const { data, isLoading, error } = useFetchQuery({
+  const fetchResult = useFetchQuery({
     page,
     pageSize,
     sort,
     filter: debouncedFilter,
   });
-  const { data: rows, totalItems } = data || {};
   const { setSort, setPage, setPageSize, setFilter } = sliceActions;
 
   const handlePageChange = (_: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, page: number) => {
@@ -67,13 +73,19 @@ function CTable<T extends { id: string | number }>(
     dispatch(setPageSize(newPageSize));
   };
 
+  if (fetchResult.isLoading) {
+    return <h1>Loading...</h1>;
+  }
+
+  if ('error' in fetchResult) {
+    return <h3>Some error {JSON.stringify(fetchResult.error)}</h3>
+  }
+
+  const { data, totalItems } = fetchResult.data;
   return (
     <>
-      {isLoading && <h1>Loading...</h1>}
-      {error && <h3>Some error {JSON.stringify(error)}</h3>}
-      {rows &&
-        <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 220px)', mb: 2 }}>
-          <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableContainer component={Paper} className={styles.tableContainer}>
+          <MatTable stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
                 {tableModel.columns.map((column) => (
@@ -90,7 +102,7 @@ function CTable<T extends { id: string | number }>(
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((item: T) => (
+              {data.map((item: T) => (
                 <MemoizedCTableRow
                   key={item.id}
                   remove={handleRemove}
@@ -99,9 +111,8 @@ function CTable<T extends { id: string | number }>(
                   columns={tableModel.columns}/>
               ))}
             </TableBody>
-          </Table>
+          </MatTable>
         </TableContainer>
-      }
       <TablePagination
         component="div"
         count={totalItems || 0}
@@ -115,4 +126,4 @@ function CTable<T extends { id: string | number }>(
   );
 }
 
-export default CTable;
+export default Table;

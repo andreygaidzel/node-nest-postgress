@@ -1,0 +1,10 @@
+
+:global(.MuiTableCell-root.MuiTableCell-head) {
+  background-color: var(--backgroundColor);
+}
+
+.cellContent {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
