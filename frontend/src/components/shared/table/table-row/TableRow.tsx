@@ -1,25 +1,22 @@
 import React, { type JSX } from 'react';
 import { IconButton, TableCell, TableRow as MatTableRow } from '@mui/material';
-import { viewDateFormat } from '@/shared/constants/baseConfig.ts';
-import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
-import type { TableEntity, ITableColumn } from '@/components/shared/table/TableView.model.ts';
+import type { ITableEntity, ITableColumn } from '@/components/shared/table/TableView.model.ts';
 import styles from './TableRow.module.scss';
+import { formatDate } from '@/utils/date.ts';
 
-interface TableRowProps<T extends TableEntity> {
+interface TableRowProps<T extends ITableEntity> {
   item: T;
   columns: ITableColumn[]
   remove: (item: T) => void;
   update?: (item: T) => void;
 }
 
-function TableRow<T extends TableEntity>({ item, remove, columns }: TableRowProps<T>) {
+function TableRow<T extends ITableEntity>({ item, remove, columns }: TableRowProps<T>) {
   const handleRemove = (event: React.MouseEvent) => {
     event.stopPropagation();
     remove(item);
   };
-
-  const formatDate = (date: string) => date && dayjs(date).format(viewDateFormat);
 
   // const handleUpdate = (event: React.MouseEvent) => {
   //   console.log(event);
@@ -52,7 +49,7 @@ function TableRow<T extends TableEntity>({ item, remove, columns }: TableRowProp
   );
 }
 
-const MemoizedCTableRow = React.memo(TableRow) as <T extends TableEntity>(
+const MemoizedCTableRow = React.memo(TableRow) as <T extends ITableEntity>(
   props: TableRowProps<T>
 ) => JSX.Element;
 

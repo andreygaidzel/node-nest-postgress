@@ -1,7 +1,8 @@
 import type { SxProps } from '@mui/system';
 import type { Theme } from '@mui/material/styles';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
-import type { ISortModel } from '@/models/IFetchTableParams.ts';
+import type { IFetchTableParams, ISortModel } from '@/models/IFetchTableParams.ts';
+import type { IPaginatedList } from '@/models/IPaginatedList.ts';
 
 export enum TableFilterType {
   DATE = 'date',
@@ -24,13 +25,48 @@ export interface ITableColumn {
   sx?: SxProps<Theme>;
 }
 
-export interface TableActions {
+export interface ITableActions {
   setPage: ActionCreatorWithPayload<number, string>;
   setPageSize: ActionCreatorWithPayload<number, string>;
   setSort: ActionCreatorWithPayload<ISortModel, string>;
   setFilter: ActionCreatorWithPayload<Record<string, string>, string>;
 }
 
-export interface TableEntity extends Record<string, string | number | undefined> {
+export type ISortFn = (sort: ISortModel) => void;
+export type IFilterFn = (filter: Record<string, string>) => void;
+
+export interface IPublicTableActions {
+  setPage: (page: number) => void;
+  setPageSize: (pageSize: number) => void;
+  setSort: ISortFn;
+  setFilter: IFilterFn;
+}
+
+export interface ITableEntity extends Record<string, string | number | undefined> {
   id: string | number;
 }
+
+type IErrorFetch = {
+  isLoading: false;
+  error?: any;
+}
+
+type ILoadingFetch = {
+  isLoading: true;
+}
+
+type ISuccessFetch<T> = {
+  isLoading: false;
+  data: IPaginatedList<T>;
+}
+
+export type IFetchResult<T> = ISuccessFetch<T> | ILoadingFetch | IErrorFetch;
+
+export type IFetchTableDataFn<T> = (args: IFetchTableParams) => IFetchResult<T>;
+
+// type UseFetchQueryType<TData, TParams> = (args: TParams) => { data?: TData; error?: unknown; isLoading: boolean };
+//
+// export type UseFetchPostsQueryType<T> = UseFetchQueryType<
+//   IPaginatedList<T>,
+//   IFetchTableParams
+// >;

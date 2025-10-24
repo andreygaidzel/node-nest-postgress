@@ -6,11 +6,14 @@ import { PostsActions } from '@/store/reducers/PostSlice.ts';
 import { POSTS_TABLE_MODEL } from '@/pages/posts-page/Posts.const.tsx';
 import { useAppSelector } from '@/hooks/redux.ts';
 import type { RootState } from '@/store/store.ts';
+import { useTableFetch } from '@/hooks/table.ts';
 
 function PostsPage() {
   const [updatePost] = useUpdatePostMutation();
   const [deleteItem] = useDeletePostMutation();
   const postsSelector = useAppSelector((state: RootState) => state.posts);
+
+  const { actions, fetchResult, state } = useTableFetch<IPost>(postsSelector, useFetchPostsQuery, PostsActions)
 
   return (
     <div className='simple-page'>
@@ -23,9 +26,9 @@ function PostsPage() {
         tableModel={POSTS_TABLE_MODEL}
         handleRemove={deleteItem}
         handleUpdate={updatePost}
-        sliceActions={PostsActions}
-        useFetchQuery={useFetchPostsQuery}
-        stateSelector={postsSelector}
+        actions={actions}
+        fetchResult={fetchResult}
+        state={state}
       />
     </div>
   );
