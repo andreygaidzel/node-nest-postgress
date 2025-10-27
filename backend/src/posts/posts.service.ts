@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { IBPost } from './posts.model';
@@ -62,5 +62,16 @@ export class PostsService {
       totalItems,
       totalPages,
     };
+  }
+
+  async deletePost(id: number): Promise<{ message: string }> {
+    const post = await this.postRepository.findByPk(id);
+    if (!post) {
+      throw new NotFoundException(`Post with id - ${id} not exist`);
+    }
+
+    await this.postRepository.destroy({ where: { id } });
+
+    return { message: `Post with id: ${id} was removed` };
   }
 }
