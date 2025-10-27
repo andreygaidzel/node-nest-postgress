@@ -1,6 +1,7 @@
 import React, { type JSX } from 'react';
-import { IconButton, TableCell, TableRow as MatTableRow } from '@mui/material';
+import { Box, IconButton, TableCell, TableRow as MatTableRow } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import type { ITableEntity, ITableColumn } from '@/components/shared/table/TableView.model.ts';
 import styles from './TableRow.module.scss';
 import { formatDate } from '@/utils/date.ts';
@@ -9,20 +10,19 @@ interface TableRowProps<T extends ITableEntity> {
   item: T;
   columns: ITableColumn[]
   remove: (item: T) => void;
-  update?: (item: T) => void;
+  edit: (item: T) => void;
 }
 
-function TableRow<T extends ITableEntity>({ item, remove, columns }: TableRowProps<T>) {
+function TableRow<T extends ITableEntity>({ item, remove, edit, columns }: TableRowProps<T>) {
   const handleRemove = (event: React.MouseEvent) => {
     event.stopPropagation();
     remove(item);
   };
 
-  // const handleUpdate = (event: React.MouseEvent) => {
-  //   console.log(event);
-  //   const title = prompt() || '';
-  //   update({ ...post, title });
-  // };
+  const handleUpdate = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    edit(item);
+  };
 
   return (
     <MatTableRow className={styles.tableRow}>
@@ -37,13 +37,22 @@ function TableRow<T extends ITableEntity>({ item, remove, columns }: TableRowPro
         ))
       }
       <TableCell align="right">
-        <IconButton
-          color="error"
-          onClick={handleRemove}
-          aria-label="delete"
-        >
-          <DeleteIcon />
-        </IconButton>
+        <Box className={styles.actions}>
+          <IconButton
+            color="warning"
+            onClick={handleUpdate}
+            aria-label="edit"
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={handleRemove}
+            aria-label="delete"
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
       </TableCell>
     </MatTableRow>
   );

@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreatePostDto, UpdatePostDto } from './dto/create-post.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { IBPost } from './posts.model';
 import { FilesService } from '../files/files.service';
@@ -13,9 +18,29 @@ export class PostsService {
     private fileService: FilesService,
   ) {}
 
-  async create(dto: CreatePostDto, image: any) {
+  async create(dto: CreatePostDto, image: File) {
     const fileName = await this.fileService.createFile(image);
     return await this.postRepository.create({ ...dto, image: fileName });
+  }
+
+  async updatePost(
+    id: number,
+    dto: UpdatePostDto,
+    image?: Express.Multer.File,
+  ) {
+    const post = await this.postRepository.findByPk(id);
+    if (!post) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (image) {
+      const fileName = await this.fileService.createFile(image);
+      await post.update({ ...dto, image: fileName });
+    } else {
+      await post.update(dto);
+    }
+
+    return post;
   }
 
   async getAllPosts(
@@ -24,7 +49,6 @@ export class PostsService {
     sort: string,
     filter: string,
   ): Promise<PaginatedList<IBPost>> {
-    console.log(111111, page, pageSize, sort, filter);
     const offset = (page - 1) * pageSize;
 
     let order: [string, 'ASC' | 'DESC'][] = [['createdAt', 'DESC']];

@@ -23,8 +23,8 @@ import type { IFetchTableParams } from '@/models/IFetchTableParams.ts';
 
 interface TableProps<T extends ITableEntity> {
   tableModel: ITableView;
-  handleRemove: (item: T) => void;
-  handleUpdate: (item: T) => void;
+  removeAction: (item: T) => void;
+  editAction: (item: T) => void;
   actions: IPublicTableActions,
   fetchResult: IFetchResult<T>;
   state: IFetchTableParams;
@@ -33,8 +33,8 @@ interface TableProps<T extends ITableEntity> {
 function Table<T extends ITableEntity>(
   {
     tableModel,
-    handleRemove,
-    handleUpdate,
+    removeAction: handleRemove,
+    editAction: handleEdit,
     actions: { setPage, setFilter, setSort, setPageSize },
     fetchResult,
     state: { page, pageSize, sort, filter }
@@ -84,7 +84,7 @@ function Table<T extends ITableEntity>(
                 <MemoizedCTableRow
                   key={item.id}
                   remove={handleRemove}
-                  update={handleUpdate}
+                  edit={handleEdit}
                   item={item}
                   columns={tableModel.columns}/>
               ))}

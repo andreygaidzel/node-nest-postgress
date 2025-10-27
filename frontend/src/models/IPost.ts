@@ -8,3 +8,8 @@ export interface IPost extends ITableEntity {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface IPostUpdate {
+  formData: FormData;
+  id: number;
+}
