@@ -44,7 +44,11 @@ export class AuthService {
       }
 
       const newAccessToken = this.jwtService.sign(
-        { id: user.id, email: user.email, roles: user.roles },
+        {
+          id: user.id,
+          email: user.email,
+          roles: user.roles.map((role) => role.value),
+        },
         { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '1d' },
       );
 

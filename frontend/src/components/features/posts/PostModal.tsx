@@ -7,8 +7,10 @@ import {
   DialogTitle,
   TextField, Typography,
 } from '@mui/material';
-import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { IPost } from '@/models/IPost.ts';
+import { useForm } from 'react-hook-form';
+import styles from './PostModal.module.scss';
 
 interface PostModalProps {
   open: boolean;
@@ -17,50 +19,75 @@ interface PostModalProps {
   onSubmit: (data: FormData, id?: number) => void;
 }
 
+interface PostFormInputs {
+  title: string;
+  content: string;
+  image?: FileList;
+}
+
 function PostModal({ open, post, onClose, onSubmit }: PostModalProps) {
-  const [content, setContent] = useState('');
-  const [title, setTitle] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isSubmitting },
+  } = useForm<PostFormInputs>({
+    defaultValues: {
+      title: '',
+      content: '',
+    },
+  });
+
+  const imageFiles = watch('image');
+  let selectedFile = imageFiles?.[0];
+
+  const resetForm = () => {
+    reset({
+      title: '',
+      content: '',
+    });
+    selectedFile = undefined;
+  }
 
   useEffect(() => {
     if (post) {
-      setTitle(post.title);
-      setContent(post.content);
+      reset({
+        title: post.title,
+        content: post.content,
+      });
     } else {
-      setTitle('');
-      setContent('');
+      resetForm();
     }
-    return () => setFile(null);
-  }, [post]);
+  }, [post, reset, open]);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files?.[0] || null);
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleFormSubmit = (data: PostFormInputs) => {
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
+    formData.append('title', data.title);
+    formData.append('content', data.content);
 
-    if (file) {
-      formData.append('image', file);
+    if (data.image && data.image[0]) {
+      formData.append('image', data.image[0]);
     }
+
     onSubmit(formData, post?.id);
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{post ? 'Edit post' : 'Create post'}</DialogTitle>
-      <form onSubmit={handleSubmit}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit(handleFormSubmit)}
+        className={styles.modalForm}
+      >
         <DialogContent>
           <TextField
             margin='normal'
             label='Title'
             type='text'
             fullWidth
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            {...register('title', { required: 'Enter title' })}
           />
 
           <TextField
@@ -69,29 +96,30 @@ function PostModal({ open, post, onClose, onSubmit }: PostModalProps) {
             multiline
             rows={4}
             fullWidth
-            value={content}
             variant="outlined"
             placeholder="Write something here..."
-            onChange={(e) => setContent(e.target.value)}
+            {...register('content', { required: 'Write content text' })}
           />
 
-          <Box component="div" sx={{ p: 2, border: '1px dashed grey', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Button variant="contained" component="label">
-              Chose picture
-              <input type="file" hidden onChange={handleFileChange} />
-            </Button>
+          <Button variant="contained" component="label">
+            Select file
+            <input type="file" hidden {...register('image')} />
+          </Button>
 
-            {(post || file) && <Typography>File: {(file as File)?.name || post?.image}</Typography>}
-          </Box>
+          {(selectedFile || post?.image) && (
+            <Typography variant="body2">
+              File: {selectedFile?.name || post?.image}
+            </Typography>
+          )}
         </DialogContent>
 
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type='submit' variant='contained'>
+          <Button type='submit' variant='contained' disabled={isSubmitting}>
             {post ? 'Save' : 'Add'}
           </Button>
         </DialogActions>
-      </form>
+      </Box>
     </Dialog>
   );
 }
