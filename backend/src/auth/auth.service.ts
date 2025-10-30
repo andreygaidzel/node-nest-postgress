@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -43,24 +38,7 @@ export class AuthService {
         throw new UnauthorizedException('User not exist');
       }
 
-      const newAccessToken = this.jwtService.sign(
-        {
-          id: user.id,
-          email: user.email,
-          roles: user.roles.map((role) => role.value),
-        },
-        { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '1d' },
-      );
-
-      const newRefreshToken = this.jwtService.sign(
-        { id: user.id },
-        { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' },
-      );
-
-      return {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      };
+      return await this.generateTokens(user);
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Refresh token is expired');
@@ -78,12 +56,12 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_ACCESS_SECRET,
-      expiresIn: '1d',
+      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
     });
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn: '7d',
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
     });
 
     return {
