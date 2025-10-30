@@ -1,7 +1,6 @@
-import type { ITableView } from '@/components/shared/table/TableView.model.ts';
+import { type ITableView, TableFilterType } from '@/components/shared/table/TableView.model.ts';
 import { Box, Tooltip } from '@mui/material';
 import { baseUrl } from '@/shared/constants/baseConfig.ts';
-import * as React from 'react';
 
 export const POSTS_TABLE_MODEL: ITableView = {
   columns: [
@@ -28,7 +27,7 @@ export const POSTS_TABLE_MODEL: ITableView = {
       header: 'Title',
       isSort: true,
       isFilter: true,
-      type: 'text',
+      type: TableFilterType.TEXT,
       sx: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', cursor: "default", maxWidth: '200px' },
       templateFn: (column, item) => (
         <Tooltip title={item[column.columnKey]}>
@@ -41,7 +40,7 @@ export const POSTS_TABLE_MODEL: ITableView = {
       header: 'Content',
       isSort: true,
       isFilter: true,
-      type: 'text',
+      type: TableFilterType.TEXT,
     },
     {
       columnKey: 'createdAt',
@@ -49,7 +48,7 @@ export const POSTS_TABLE_MODEL: ITableView = {
       align: 'center',
       isSort: true,
       isFilter: true,
-      type: 'date',
+      type: TableFilterType.DATE,
       sx: { whiteSpace: 'nowrap' }
     },
     {
@@ -58,7 +57,7 @@ export const POSTS_TABLE_MODEL: ITableView = {
       align: 'center',
       isSort: true,
       isFilter: true,
-      type: 'date',
+      type: TableFilterType.DATE,
       sx: { whiteSpace: 'nowrap' }
     }
   ]

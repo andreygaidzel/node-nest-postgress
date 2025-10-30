@@ -63,7 +63,21 @@ export class PostsService {
       for (const pair of filterPairs) {
         const [key, value] = pair.split('=');
         if (key && value) {
-          where[key.trim()] = { [Op.iLike]: `%${value.trim()}%` };
+          if (key.includes('*lte')) {
+            const originalKey = key.replace('*lte', '');
+            where[originalKey] = {
+              ...where[originalKey],
+              [Op.lte]: new Date(decodeURIComponent(value)),
+            };
+          } else if (key.includes('*gte')) {
+            const originalKey = key.replace('*gte', '');
+            where[originalKey] = {
+              ...where[originalKey],
+              [Op.gte]: new Date(decodeURIComponent(value)),
+            };
+          } else {
+            where[key.trim()] = { [Op.iLike]: `%${value.trim()}%` };
+          }
         }
       }
     }

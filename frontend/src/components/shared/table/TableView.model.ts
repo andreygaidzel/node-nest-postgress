@@ -29,11 +29,13 @@ export interface ITableActions {
   setPage: ActionCreatorWithPayload<number, string>;
   setPageSize: ActionCreatorWithPayload<number, string>;
   setSort: ActionCreatorWithPayload<ISortModel, string>;
-  setFilter: ActionCreatorWithPayload<Record<string, string>, string>;
+  setFilter: ActionCreatorWithPayload<Record<string, IFilterParam>, string>;
 }
 
 export type ISortFn = (sort: ISortModel) => void;
-export type IFilterFn = (filter: Record<string, string>) => void;
+export type IFilterFn = (filter: Record<string, IFilterParam>) => void;
+
+export type IFilterParam = string | (string | null)[];
 
 export interface IPublicTableActions {
   setPage: (page: number) => void;
@@ -63,10 +65,3 @@ type ISuccessFetch<T> = {
 export type IFetchResult<T> = ISuccessFetch<T> | ILoadingFetch | IErrorFetch;
 
 export type IFetchTableDataFn<T> = (args: IFetchTableParams) => IFetchResult<T>;
-
-// type UseFetchQueryType<TData, TParams> = (args: TParams) => { data?: TData; error?: unknown; isLoading: boolean };
-//
-// export type UseFetchPostsQueryType<T> = UseFetchQueryType<
-//   IPaginatedList<T>,
-//   IFetchTableParams
-// >;

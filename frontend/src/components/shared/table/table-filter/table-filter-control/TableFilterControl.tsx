@@ -1,16 +1,18 @@
-import { TableFilterType } from '@/components/shared/table/TableView.model.ts';
-import { Box, TextField } from '@mui/material';
+import { type IFilterParam, TableFilterType } from '@/components/shared/table/TableView.model.ts';
+import { Box, IconButton, TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import * as React from 'react';
 import type { Dayjs } from 'dayjs';
+import { useEffect } from 'react';
+import Close from '@mui/icons-material/Close';
 
 interface TableFilterControlProps {
   type: TableFilterType | undefined;
   filterKey: string;
-  filter: Record<string, string>;
-  onFilterChange: (key: string, value: string) => void;
+  filter: Record<string, IFilterParam>;
+  onFilterChange: (key: string, value: IFilterParam) => void;
 }
 
 const TableFilterControl = ({ type, filterKey, filter, onFilterChange: handleFilterChange }: TableFilterControlProps) => {
@@ -24,6 +26,16 @@ const TableFilterControl = ({ type, filterKey, filter, onFilterChange: handleFil
       setEndDate(null);
     }
   };
+
+  const handleDateClear = () => {
+    setEndDate(null);
+    setStartDate(null);
+  }
+
+  useEffect(() => {
+    console.log(startDate, endDate);
+    handleFilterChange(filterKey, [startDate?.toISOString() || null, endDate?.toISOString() || null])
+  }, [startDate, endDate])
 
   switch (type) {
     case TableFilterType.TEXT:
@@ -53,8 +65,15 @@ const TableFilterControl = ({ type, filterKey, filter, onFilterChange: handleFil
               label="Date To"
               value={endDate}
               minDate={startDate || undefined}
-              onChange={(newValue) => setEndDate(newValue)}
+              onChange={setEndDate}
             />
+            <IconButton
+              color="error"
+              onClick={handleDateClear}
+              aria-label="delete"
+            >
+              <Close />
+            </IconButton>
           </Box>
         </LocalizationProvider>
       );

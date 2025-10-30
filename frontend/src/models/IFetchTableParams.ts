@@ -1,3 +1,5 @@
+import type { IFilterParam } from '@/components/shared/table/TableView.model.ts';
+
 export enum SORT_ORDERS {
   ASC = 'asc',
   DESC = 'desc'
@@ -13,5 +15,5 @@ export interface IFetchTableParams {
   pageSize: number;
   page: number;
   sort: ISortModel;
-  filter: Record<string, string>;
+  filter: Record<string, IFilterParam>;
 }
