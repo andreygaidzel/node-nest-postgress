@@ -3,6 +3,7 @@ import type { Theme } from '@mui/material/styles';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import type { IFetchTableParams, ISortModel } from '@/models/IFetchTableParams.ts';
 import type { IPaginatedList } from '@/models/IPaginatedList.ts';
+import React from 'react';
 
 export enum TableFilterType {
   DATE = 'date',
@@ -29,13 +30,14 @@ export interface ITableActions {
   setPage: ActionCreatorWithPayload<number, string>;
   setPageSize: ActionCreatorWithPayload<number, string>;
   setSort: ActionCreatorWithPayload<ISortModel, string>;
-  setFilter: ActionCreatorWithPayload<Record<string, IFilterParam>, string>;
+  setFilter: ActionCreatorWithPayload<IFilter, string>;
 }
 
 export type ISortFn = (sort: ISortModel) => void;
-export type IFilterFn = (filter: Record<string, IFilterParam>) => void;
+export type IFilterFn = (filter: IFilter) => void;
 
 export type IFilterParam = string | (string | null)[];
+export type IFilter = Record<string, IFilterParam>;
 
 export interface IPublicTableActions {
   setPage: (page: number) => void;

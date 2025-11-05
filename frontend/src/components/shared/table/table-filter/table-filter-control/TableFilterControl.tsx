@@ -1,4 +1,4 @@
-import { type IFilterParam, TableFilterType } from '@/components/shared/table/TableView.model.ts';
+import { type IFilter, type IFilterParam, TableFilterType } from '@/components/shared/table/TableView.model.ts';
 import { Box, IconButton, TextField } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -11,7 +11,7 @@ import Close from '@mui/icons-material/Close';
 interface TableFilterControlProps {
   type: TableFilterType | undefined;
   filterKey: string;
-  filter: Record<string, IFilterParam>;
+  filter: IFilter;
   onFilterChange: (key: string, value: IFilterParam) => void;
 }
 

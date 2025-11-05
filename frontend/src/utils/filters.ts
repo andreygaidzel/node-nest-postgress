@@ -1,6 +1,6 @@
-import type { IFilterParam } from '@/components/shared/table/TableView.model.ts';
+import type { IFilter } from '@/components/shared/table/TableView.model.ts';
 
-export const mapFilters = (filters: Record<string, IFilterParam> | undefined) => {
+export const mapFilters = (filters: IFilter | undefined) => {
   if (!filters) {
     return undefined;
   }

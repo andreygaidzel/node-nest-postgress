@@ -2,7 +2,12 @@ import { IconButton, Popover } from '@mui/material';
 import FilterList from '@mui/icons-material/FilterList';
 import * as React from 'react';
 import { useCallback } from 'react';
-import { type IFilterFn, type IFilterParam, TableFilterType } from '@/components/shared/table/TableView.model.ts';
+import {
+  type IFilter,
+  type IFilterFn,
+  type IFilterParam,
+  TableFilterType
+} from '@/components/shared/table/TableView.model.ts';
 import TableFilterControl from '@/components/shared/table/table-filter/table-filter-control/TableFilterControl.tsx';
 import type { PopoverOrigin } from '@mui/material/Popover';
 
@@ -17,7 +22,7 @@ const transformOrigin: PopoverOrigin = {
 }
 
 interface TableFilterProps {
-  filter: Record<string, IFilterParam>;
+  filter: IFilter;
   anchorEls: Record<string, HTMLElement | null>;
   setAnchorEls: React.Dispatch<React.SetStateAction<Record<string, HTMLElement | null>>>;
   filterKey: string;
