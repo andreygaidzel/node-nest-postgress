@@ -26,7 +26,7 @@ export interface IRoute {
 
 export const publicRoutes: IRoute[] = [
   {
-    path: `${Paths.HOME}/*`,
+    path: `${Paths.HOME}`,
     element: <HomePage />,
     onlyAuth: true,
   },

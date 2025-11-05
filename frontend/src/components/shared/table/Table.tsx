@@ -20,6 +20,7 @@ import MemoizedCTableRow from '@/components/shared/table/table-row/TableRow.tsx'
 import { ROWS_PER_PAGE_OPTIONS } from '@/components/shared/table/Table.const.ts';
 import styles from './Table.module.scss';
 import type { IFetchTableParams } from '@/models/IFetchTableParams.ts';
+import Loader from '@/components/shared/loader/Loader.tsx';
 
 interface TableProps<T extends ITableEntity> {
   tableModel: ITableView;
@@ -51,7 +52,7 @@ function Table<T extends ITableEntity>(
   };
 
   if (fetchResult.isLoading) {
-    return <h1>Loading...</h1>;
+    return <Loader />;
   }
 
   if ('error' in fetchResult) {

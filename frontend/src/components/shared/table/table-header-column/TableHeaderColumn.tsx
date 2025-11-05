@@ -2,14 +2,19 @@ import { Box, TableCell, TableSortLabel } from '@mui/material';
 import TableFilter from '@/components/shared/table/table-filter/TableFilter.tsx';
 import * as React from 'react';
 import { useState } from 'react';
-import { type IFilterFn, type ISortFn, type ITableColumn } from '@/components/shared/table/TableView.model.ts';
+import {
+  type IFilter,
+  type IFilterFn,
+  type ISortFn,
+  type ITableColumn
+} from '@/components/shared/table/TableView.model.ts';
 import { type ISortModel, SORT_ORDERS } from '@/models/IFetchTableParams.ts';
 import styles from './TableHeaderColumn.module.scss';
 
 interface ChildProps {
   column: ITableColumn;
   sort: ISortModel;
-  filter: Record<string, string>;
+  filter: IFilter;
   setSort: ISortFn;
   setFilter: IFilterFn;
 }

@@ -9,6 +9,10 @@ export const mapFilters = (filters: IFilter | undefined) => {
     return undefined;
   }
 
+  if (entries.every(([, value]) => !value)) {
+    return undefined;
+  }
+
   let filterString = '';
   entries.forEach(([key, value]) => {
     if (filterString.length) {
@@ -20,7 +24,7 @@ export const mapFilters = (filters: IFilter | undefined) => {
         filterString += `${key}*gte=${encodeURIComponent(from)};${key}*lte=${encodeURIComponent(to)}`;
       }
     } else {
-      filterString += `${key}=${encodeURIComponent(value)}`;
+      filterString += `${key}=${value && encodeURIComponent(value)}`;
     }
   });
 

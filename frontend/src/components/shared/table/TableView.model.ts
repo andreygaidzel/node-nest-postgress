@@ -36,7 +36,7 @@ export interface ITableActions {
 export type ISortFn = (sort: ISortModel) => void;
 export type IFilterFn = (filter: IFilter) => void;
 
-export type IFilterParam = string | (string | null)[];
+export type IFilterParam = string | null | (string | null)[];
 export type IFilter = Record<string, IFilterParam>;
 
 export interface IPublicTableActions {

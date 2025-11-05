@@ -28,7 +28,15 @@ const postsSlice = createSlice({
       state.sort = action.payload;
     },
     setFilter: (state, action: PayloadAction<IFilter>) => {
-      state.filter = { ...state.filter, ...action.payload };
+      const filterEntry = Object.entries(action.payload);
+      filterEntry.forEach(([key, value]) => {
+        if (!value || (Array.isArray(value) && value.every(p => !p))) {
+          delete state.filter[key];
+        } else {
+          state.filter[key] = value;
+        }
+      })
+
       PostsActions.setPage(DEFAULT_PAGE);
     },
   },
