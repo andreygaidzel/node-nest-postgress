@@ -58,14 +58,16 @@ function PostsPage() {
         </Button>
       </div>
 
-      <Table<IPost>
-        tableModel={POSTS_TABLE_MODEL}
-        removeAction={deleteItem}
-        editAction={handleEditPost}
-        actions={actions}
-        fetchResult={fetchResult}
-        state={state}
-      />
+      <div className='simple-page__content'>
+        <Table<IPost>
+          tableModel={POSTS_TABLE_MODEL}
+          removeAction={deleteItem}
+          editAction={handleEditPost}
+          actions={actions}
+          fetchResult={fetchResult}
+          state={state}
+        />
+      </div>
 
       <PostModal
         open={isModalOpen}

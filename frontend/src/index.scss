@@ -79,16 +79,6 @@ button:focus-visible {
   }
 }
 
-.post {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 300px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-}
-
 .page-name {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-size: 2rem;
@@ -97,13 +87,17 @@ button:focus-visible {
 }
 
 .simple-page {
-  padding: 1rem;
   width: calc(100% - 300px);
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+  &__content {
+    padding: 1rem 1rem 0;
+    overflow: auto;
+    max-height: calc(100% - 69px);
   }
 }
 

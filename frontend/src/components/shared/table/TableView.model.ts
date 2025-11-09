@@ -50,16 +50,16 @@ export interface ITableEntity extends Record<string, string | number | undefined
   id: string | number;
 }
 
-type IErrorFetch = {
+export type IErrorFetch = {
   isLoading: false;
   error?: any;
 }
 
-type ILoadingFetch = {
+export type ILoadingFetch = {
   isLoading: true;
 }
 
-type ISuccessFetch<T> = {
+export type ISuccessFetch<T> = {
   isLoading: false;
   data: IPaginatedList<T>;
 }
