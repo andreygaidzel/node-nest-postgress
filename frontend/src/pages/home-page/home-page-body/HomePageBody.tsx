@@ -7,10 +7,14 @@ import { Button, Card, CardActions, CardContent, CardMedia, Grid, Typography } f
 import type { IFetchResult } from '@/components/shared/table/TableView.model.ts';
 import type { IPost } from '@/models/IPost.ts';
 import styles from './HomePageBody.module.scss';
+import { showNotification } from '@/store/reducers/NotificationSlice.ts';
+import { useAppDispatch } from '@/hooks/redux.ts';
+import { isFetchBaseQueryError } from '@/models/IError.ts';
 
 const gridSize = { sm: 12, md: 4 };
 
 const HomePageBody: React.FC = () => {
+  const dispatch = useAppDispatch();
   const fetchResult: IFetchResult<IPost> = useFetchPostsQuery({
     page: DEFAULT_PAGE,
     pageSize: 6,
@@ -21,12 +25,12 @@ const HomePageBody: React.FC = () => {
     filter: {},
   });
 
-  if (fetchResult.isLoading) {
-    return <Loader/>;
+  if ('error' in fetchResult && fetchResult.error && isFetchBaseQueryError(fetchResult.error)) {
+    dispatch(showNotification({ message: fetchResult.error?.data.message, severity: "error" }));
   }
 
-  if ('error' in fetchResult) {
-    return <h3>Some error {JSON.stringify(fetchResult.error)}</h3>
+  if (fetchResult.isLoading || 'error' in fetchResult) {
+    return <Loader/>;
   }
 
   if ('data' in fetchResult) {

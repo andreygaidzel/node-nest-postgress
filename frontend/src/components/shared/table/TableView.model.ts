@@ -1,9 +1,10 @@
 import type { SxProps } from '@mui/system';
 import type { Theme } from '@mui/material/styles';
-import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import type { ActionCreatorWithPayload, SerializedError } from '@reduxjs/toolkit';
 import type { IFetchTableParams, ISortModel } from '@/models/IFetchTableParams.ts';
 import type { IPaginatedList } from '@/models/IPaginatedList.ts';
 import React from 'react';
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 export enum TableFilterType {
   DATE = 'date',
@@ -52,7 +53,7 @@ export interface ITableEntity extends Record<string, string | number | undefined
 
 export type IErrorFetch = {
   isLoading: false;
-  error?: any;
+  error?: FetchBaseQueryError | SerializedError;
 }
 
 export type ILoadingFetch = {
