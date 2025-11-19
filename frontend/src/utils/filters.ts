@@ -1,5 +1,6 @@
+import type { IFilter } from '@/components/shared/table/TableView.model.ts';
 
-export const mapFilters = (filters: Record<string, string> | undefined) => {
+export const mapFilters = (filters: IFilter | undefined) => {
   if (!filters) {
     return undefined;
   }
@@ -8,12 +9,23 @@ export const mapFilters = (filters: Record<string, string> | undefined) => {
     return undefined;
   }
 
+  if (entries.every(([, value]) => !value)) {
+    return undefined;
+  }
+
   let filterString = '';
   entries.forEach(([key, value]) => {
     if (filterString.length) {
       filterString += ';';
     }
-    filterString += `${key}=${encodeURIComponent(value)}`;
+    if (Array.isArray(value)) {
+      const [from, to] = value;
+      if (from && to) {
+        filterString += `${key}*gte=${encodeURIComponent(from)};${key}*lte=${encodeURIComponent(to)}`;
+      }
+    } else {
+      filterString += `${key}=${value && encodeURIComponent(value)}`;
+    }
   });
 
   return filterString;

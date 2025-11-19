@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import type { IPost } from '../models/IPost.ts';
+import type { IPost, IPostUpdate } from '../models/IPost.ts';
 import { baseQueryWithReauth } from '@/baseQuery.ts';
 import type { IPaginatedList } from '@/models/IPaginatedList.ts';
 import { mapFilters } from '@/utils/filters.ts';
@@ -31,11 +31,11 @@ export const postAPI = createApi({
       }),
       invalidatesTags: ['Post'],
     }),
-    updatePost: build.mutation<IPost, IPost>({
-      query: (post) => ({
-        url: `/posts/${post.id}`,
+    updatePost: build.mutation<IPost, IPostUpdate>({
+      query: (data) => ({
+        url: `/posts/${data.id}`,
         method: 'PUT',
-        body: post,
+        body: data.formData,
       }),
       invalidatesTags: ['Post'],
     }),

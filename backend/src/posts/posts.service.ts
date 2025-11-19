@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreatePostDto, UpdatePostDto } from './dto/create-post.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { IBPost } from './posts.model';
 import { FilesService } from '../files/files.service';
 import { PaginatedList } from '../models/paginated-page.model';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 
 @Injectable()
 export class PostsService {
@@ -13,9 +18,40 @@ export class PostsService {
     private fileService: FilesService,
   ) {}
 
-  async create(dto: CreatePostDto, image: any) {
+  async create(dto: CreatePostDto, image: File) {
     const fileName = await this.fileService.createFile(image);
     return await this.postRepository.create({ ...dto, image: fileName });
+  }
+
+  async updatePost(
+    id: number,
+    dto: UpdatePostDto,
+    image?: Express.Multer.File,
+  ) {
+    const post = await this.postRepository.findByPk(id);
+    if (!post) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (image) {
+      const fileName = await this.fileService.createFile(image);
+      await post.update({ ...dto, image: fileName });
+    } else {
+      await post.update(dto);
+    }
+
+    return post;
+  }
+
+  async deletePost(id: number): Promise<{ message: string }> {
+    const post = await this.postRepository.findByPk(id);
+    if (!post) {
+      throw new NotFoundException(`Post with id - ${id} not exist`);
+    }
+
+    await this.postRepository.destroy({ where: { id } });
+
+    return { message: `Post with id: ${id} was removed` };
   }
 
   async getAllPosts(
@@ -24,7 +60,6 @@ export class PostsService {
     sort: string,
     filter: string,
   ): Promise<PaginatedList<IBPost>> {
-    console.log(111111, page, pageSize, sort, filter);
     const offset = (page - 1) * pageSize;
 
     let order: [string, 'ASC' | 'DESC'][] = [['createdAt', 'DESC']];
@@ -33,16 +68,9 @@ export class PostsService {
       order = [[field, direction?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC']];
     }
 
-    const where: any = {};
-    if (filter) {
-      const filterPairs = filter.split(';');
-      for (const pair of filterPairs) {
-        const [key, value] = pair.split('=');
-        if (key && value) {
-          where[key.trim()] = { [Op.iLike]: `%${value.trim()}%` };
-        }
-      }
-    }
+    const where: WhereOptions<IBPost> | undefined = filter
+      ? this._parseFilters(filter)
+      : {};
 
     const { rows: posts, count: totalItems } =
       await this.postRepository.findAndCountAll({
@@ -62,5 +90,36 @@ export class PostsService {
       totalItems,
       totalPages,
     };
+  }
+
+  private _parseDate(date: string): Date {
+    return new Date(decodeURIComponent(date));
+  }
+
+  private _parseFilters(filter: string): WhereOptions<IBPost> | undefined {
+    const where: WhereOptions<IBPost> | undefined = {};
+    const filterPairs = filter.split(';');
+    for (const pair of filterPairs) {
+      const [key, value] = pair.split('=');
+      if (key && value) {
+        if (key.includes('*lte')) {
+          const originalKey = key.replace('*lte', '');
+          where[originalKey] = {
+            ...where[originalKey],
+            [Op.lte]: this._parseDate(value),
+          };
+        } else if (key.includes('*gte')) {
+          const originalKey = key.replace('*gte', '');
+          where[originalKey] = {
+            ...where[originalKey],
+            [Op.gte]: this._parseDate(value),
+          };
+        } else {
+          where[key.trim()] = { [Op.iLike]: `%${value.trim()}%` };
+        }
+      }
+    }
+
+    return where;
   }
 }

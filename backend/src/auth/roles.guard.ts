@@ -43,9 +43,13 @@ export class RolesGuard implements CanActivate {
       req.user = this.jwtService.verify(token, {
         secret: process.env.JWT_ACCESS_SECRET,
       });
+
       return req.user.roles.some((role) => requiredRoles.includes(role));
     } catch (e) {
-      if (e.name === 'TokenExpiredError') {
+      if (
+        e.name === 'TokenExpiredError' ||
+        e instanceof UnauthorizedException
+      ) {
         throw new UnauthorizedException('Token is expired');
       }
       throw new HttpException('No access', HttpStatus.FORBIDDEN);

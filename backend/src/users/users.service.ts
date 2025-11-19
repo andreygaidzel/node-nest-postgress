@@ -60,7 +60,12 @@ export class UsersService implements OnModuleInit {
   }
 
   async getUserById(id: number) {
-    return await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      include: { all: true },
+    });
+
+    return user?.get({ plain: true });
   }
 
   async getUserByEmail(email: string) {

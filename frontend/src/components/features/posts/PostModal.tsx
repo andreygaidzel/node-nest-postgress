@@ -7,93 +7,120 @@ import {
   DialogTitle,
   TextField, Typography,
 } from '@mui/material';
-import { type ChangeEvent, type FormEvent, useState } from 'react';
-import { useCreatePostMutation } from '@/services/PostService.ts';
+import { useEffect } from 'react';
+import type { IPost } from '@/models/IPost.ts';
+import { useForm } from 'react-hook-form';
+import styles from './PostModal.module.scss';
 
-function PostModal() {
-  const [open, setOpen] = useState(false);
-  const [content, setContent] = useState('');
-  const [title, setTitle] = useState('');
-  const [createPost] = useCreatePostMutation();
-  const [file, setFile] = useState<File | null>(null);
+interface PostModalProps {
+  open: boolean;
+  post: IPost | null;
+  onClose: () => void;
+  onSubmit: (data: FormData, id?: number) => void;
+}
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+interface PostFormInputs {
+  title: string;
+  content: string;
+  image?: FileList;
+}
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e)
-    setFile(e.target.files?.[0] || null);
-  };
+function PostModal({ open, post, onClose, onSubmit }: PostModalProps) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isSubmitting },
+  } = useForm<PostFormInputs>({
+    defaultValues: {
+      title: '',
+      content: '',
+    },
+  });
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!file) {
-      alert("You should upload a file");
-      return;
+  const imageFiles = watch('image');
+  let selectedFile = imageFiles?.[0];
+
+  const resetForm = () => {
+    reset({
+      title: '',
+      content: '',
+    });
+    selectedFile = undefined;
+  }
+
+  useEffect(() => {
+    if (post) {
+      reset({
+        title: post.title,
+        content: post.content,
+      });
+    } else {
+      resetForm();
+    }
+  }, [post, reset, open]);
+
+  const handleFormSubmit = (data: PostFormInputs) => {
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('content', data.content);
+
+    if (data.image && data.image[0]) {
+      formData.append('image', data.image[0]);
     }
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
-    formData.append('image', file);
-    console.log('Form is send', { title, content, file }, e);
-    await createPost(formData);
-    setTitle('');
-    setContent('');
-    setFile(null);
-    handleClose();
+    onSubmit(formData, post?.id);
   };
 
   return (
-    <div>
-      <Button variant='contained' onClick={handleOpen}>
-        Add New Post
-      </Button>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>{post ? 'Edit post' : 'Create post'}</DialogTitle>
+      <Box
+        component="form"
+        onSubmit={handleSubmit(handleFormSubmit)}
+        className={styles.modalForm}
+      >
+        <DialogContent>
+          <TextField
+            margin='normal'
+            label='Title'
+            type='text'
+            fullWidth
+            {...register('title', { required: 'Enter title' })}
+          />
 
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Create Post</DialogTitle>
-        <form onSubmit={handleSubmit}>
-          <DialogContent>
-            <TextField
-              margin='normal'
-              label='Title'
-              type='text'
-              fullWidth
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+          <TextField
+            label="Content"
+            margin='normal'
+            multiline
+            rows={4}
+            fullWidth
+            variant="outlined"
+            placeholder="Write something here..."
+            {...register('content', { required: 'Write content text' })}
+          />
 
-            <TextField
-              label="Content"
-              margin='normal'
-              multiline
-              rows={4}
-              fullWidth
-              value={content}
-              variant="outlined"
-              placeholder="Write something here..."
-              onChange={(e) => setContent(e.target.value)}
-            />
+          <Button variant="contained" component="label">
+            Select file
+            <input type="file" hidden {...register('image')} />
+          </Button>
 
-            <Box component="div" sx={{ p: 2, border: '1px dashed grey', display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Button variant="contained" component="label">
-                Chose picture
-                <input type="file" hidden onChange={handleFileChange} />
-              </Button>
+          {(selectedFile || post?.image) && (
+            <Typography variant="body2">
+              File: {selectedFile?.name || post?.image}
+            </Typography>
+          )}
+        </DialogContent>
 
-              {file && <Typography>File: {(file as File).name}</Typography>}
-            </Box>
-          </DialogContent>
-
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type='submit' variant='contained'>
-              Save
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </div>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type='submit' variant='contained' disabled={isSubmitting}>
+            {post ? 'Save' : 'Add'}
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
   );
 }
 

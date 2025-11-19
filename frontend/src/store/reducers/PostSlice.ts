@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type IFetchTableParams, type ISortModel, SORT_ORDERS } from '@/models/IFetchTableParams.ts';
 import { DEFAULT_PAGE } from '@/shared/constants/baseConfig.ts';
+import type { IFilter } from '@/components/shared/table/TableView.model.ts';
 
 const initialState: IFetchTableParams = {
   page: DEFAULT_PAGE,
@@ -26,8 +27,16 @@ const postsSlice = createSlice({
     setSort: (state, action: PayloadAction<ISortModel>) => {
       state.sort = action.payload;
     },
-    setFilter: (state, action: PayloadAction<Record<string, string>>) => {
-      state.filter = { ...state.filter, ...action.payload };
+    setFilter: (state, action: PayloadAction<IFilter>) => {
+      const filterEntry = Object.entries(action.payload);
+      filterEntry.forEach(([key, value]) => {
+        if (!value || (Array.isArray(value) && value.every(p => !p))) {
+          delete state.filter[key];
+        } else {
+          state.filter[key] = value;
+        }
+      })
+
       PostsActions.setPage(DEFAULT_PAGE);
     },
   },

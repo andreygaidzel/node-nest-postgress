@@ -1,0 +1,20 @@
+
+.postCard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.postTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.postContent {
+  flex-grow: 1
+}
+
+.postDescription {
+  color: #aaa;
+}

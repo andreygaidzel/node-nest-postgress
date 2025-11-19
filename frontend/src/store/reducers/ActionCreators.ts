@@ -13,10 +13,6 @@ export const fetchUsers = createAsyncThunk<
 >('user/fetchAll', async (_, { rejectWithValue }) => {
   try {
     const response = await callBaseQuery({ url: '/users', method: 'GET' });
-    // const response = await axios.get<IUser[]>(`${baseUrl}/users`, {
-    //   params: { _limit: limit, _page: page },
-    // });
-    // return response.data;
     return response.data as IUser[];
   } catch (e) {
     return rejectWithValue('Error in load users request');
